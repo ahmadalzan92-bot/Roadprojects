@@ -1,0 +1,3316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام متابعة مشاريع الطرق - وزارة الأشغال العامة والإسكان - الأردن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+</script>
+<style>
+:root {
+    --primary: #1a3a5c;
+    --primary-dark: #0f2847;
+    --secondary: #f0a500;
+    --secondary-dark: #e05c00;
+    --bg-dark: #0d2137;
+    --bg-card: #162d45;
+    --bg-input: #1e3a52;
+    --border: #2a4a6a;
+    --text-primary: #e8f0f8;
+    --text-secondary: #7fa8c9;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --purple: #8b5cf6;
+    --orange: #f97316;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary);
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+}
+.screen.active {
+    display: flex;
+}
+
+/* ═══════════════ LOGIN SCREEN ═══════════════ */
+.login-screen {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a1628 0%, #0d2137 40%, #162d45 100%);
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(240, 165, 0, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.login-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 1;
+}
+
+.login-box .logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-box .logo .logo-img {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 15px;
+    background: linear-gradient(135deg, #1a3a5c, #0f2847);
+    border: 3px solid var(--secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: var(--secondary);
+    box-shadow: 0 0 30px rgba(240, 165, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-box .logo .logo-img::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: rgba(240, 165, 0, 0.4);
+    animation: logoSpin 3s linear infinite;
+}
+
+@keyframes logoSpin {
+    to { transform: rotate(360deg); }
+}
+
+.login-box .logo h2 {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--secondary);
+    margin-bottom: 4px;
+}
+
+.login-box .logo .subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.login-box .logo .ministry-name {
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.login-box .logo .official-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 15px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1a3a5c;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.login-box .logo .official-logo .logo-placeholder {
+    text-align: center;
+    font-size: 9px;
+    color: #1a3a5c;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+/* ═══════════════ DASHBOARD SCREEN ═══════════════ */
+.dashboard-screen {
+    flex-direction: column;
+}
+
+.dash-header {
+    background: var(--primary);
+    border-bottom: 3px solid var(--secondary);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.dash-header .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-header .mini-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    border: 2px solid var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.dash-header h1 {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text-primary);
+}
+
+.dash-header .header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 11px;
+    flex-wrap: wrap;
+}
+
+.dash-content {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+/* ═══════════════ OFFICIAL LOGO PLACEHOLDER ═══════════════ */
+.official-logo {
+    background: #ffffff;
+    border: 2px solid #1a3a5c;
+    border-radius: 8px;
+    padding: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ═══════════════ STATS ═══════════════ */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--secondary);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-card .val {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--secondary);
+    letter-spacing: -0.5px;
+}
+
+.stat-card .lbl {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* ═══════════════ SPEEDOMETER ═══════════════ */
+.speedometer-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 8px;
+}
+
+.speedometer-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.speedometer-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--secondary);
+    text-align: center;
+}
+
+.speedometer-value .unit {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* ═══════════════ COUNTER DIGITS ═══════════════ */
+.counter-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    margin: 6px 0;
+    direction: ltr;
+}
+
+.counter-digit {
+    background: linear-gradient(180deg, var(--bg-input), var(--bg-dark));
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    font-size: 26px;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    min-width: 38px;
+    text-align: center;
+    color: var(--secondary);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ═══════════════ TREND BOX ═══════════════ */
+.trend-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.trend-box.up {
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid rgba(34, 197, 94, 0.4);
+    color: var(--success);
+}
+
+.trend-box.down {
+    background: rgba(239, 68, 68, 0.15);
+    border: 2px solid rgba(239, 68, 68, 0.4);
+    color: var(--danger);
+}
+
+.trend-box.stable {
+    background: rgba(245, 158, 11, 0.15);
+    border: 2px solid rgba(245, 158, 11, 0.4);
+    color: var(--warning);
+}
+
+/* ═══════════════ KPI CARDS ═══════════════ */
+.kpi-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.kpi-card:hover {
+    border-color: var(--secondary);
+    box-shadow: var(--shadow-sm);
+}
+
+.kpi-card .kpi-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+/* ═══════════════ CHART BOX ═══════════════ */
+.chart-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 14px;
+    height: 350px;
+    position: relative;
+}
+
+.chart-box canvas {
+    max-height: 100%;
+}
+
+/* ═══════════════ PROGRESS BAR ═══════════════ */
+.progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.prog-green { background: var(--success); }
+.prog-yellow { background: var(--warning); }
+.prog-red { background: var(--danger); }
+.prog-blue { background: var(--info); }
+.prog-purple { background: var(--purple); }
+
+/* ═══════════════ BADGES ═══════════════ */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.badge-green { background: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.3); }
+.badge-red { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-yellow { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-blue { background: rgba(59, 130, 246, 0.15); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.3); }
+.badge-orange { background: rgba(249, 115, 22, 0.15); color: var(--orange); border: 1px solid rgba(249, 115, 22, 0.3); }
+.badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.3); }
+
+/* ═══════════════ BUTTONS ═══════════════ */
+.btn {
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary { background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); color: #000; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+.btn-outline:hover { border-color: var(--secondary); color: var(--secondary); }
+.btn-sm { padding: 5px 10px; font-size: 9px; }
+.btn-xs { padding: 3px 7px; font-size: 8px; border-radius: 4px; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-warning { background: var(--warning); color: #000; }
+.btn-print { background: #6366f1; color: #fff; }
+.btn-word { background: #2b579a; color: #fff; }
+.btn-excel { background: #217346; color: #fff; }
+.btn-project { background: #6b21a8; color: #fff; }
+.btn-info { background: var(--info); color: #fff; }
+
+/* ═══════════════ PRINT STYLES ═══════════════ */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #1a1a2e !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .print-header {
+        background: linear-gradient(135deg, #1a3a5c, #0f2847) !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: 20px !important;
+        border-radius: 8px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .print-header * {
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .print-header .gold-text {
+        color: #f0a500 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    table {
+        border: 1px solid #ddd !important;
+        page-break-inside: auto;
+    }
+    
+    th {
+        background: #1a3a5c !important;
+        color: #f0a500 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: 10px !important;
+    }
+    
+    td {
+        padding: 8px !important;
+        border: 1px solid #ddd !important;
+    }
+    
+    .badge {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .badge-green { background: #d1fae5 !important; color: #065f46 !important; border: 1px solid #6ee7b7 !important; }
+    .badge-red { background: #fee2e2 !important; color: #991b1b !important; border: 1px solid #fca5a5 !important; }
+    .badge-yellow { background: #fef3c7 !important; color: #92400e !important; border: 1px solid #fcd34d !important; }
+    .badge-blue { background: #dbeafe !important; color: #1e40af !important; border: 1px solid #93c5fd !important; }
+    
+    .progress-bar {
+        background: #e5e7eb !important;
+        border: 1px solid #d1d5db !important;
+    }
+    
+    .progress-fill {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .prog-green { background: #22c55e !important; }
+    .prog-yellow { background: #f59e0b !important; }
+    .prog-red { background: #ef4444 !important; }
+    
+    .footer {
+        background: #1a3a5c !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: 15px !important;
+        border-radius: 8px !important;
+        margin-top: 20px !important;
+        text-align: center !important;
+    }
+    
+    @page {
+        margin: 1.2cm;
+        size: A4;
+    }
+}
+
+.table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: auto;
+    margin-bottom: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+thead {
+    background: var(--primary);
+}
+
+th {
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--secondary);
+    text-align: right;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--secondary);
+}
+
+td {
+    padding: 8px 12px;
+    font-size: 10px;
+    border-bottom: 1px solid rgba(42, 74, 106, 0.4);
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.editable {
+    background: transparent;
+    border: 1px dashed transparent;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: inherit;
+    font-family: 'Cairo', sans-serif;
+    font-size: inherit;
+    min-width: 40px;
+    transition: var(--transition);
+}
+
+.editable:hover {
+    border-color: var(--secondary);
+    background: rgba(240, 165, 0, 0.05);
+}
+
+.editable:focus {
+    outline: none;
+    border-color: var(--secondary);
+    background: var(--bg-input);
+    box-shadow: 0 0 8px rgba(240, 165, 0, 0.2);
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--secondary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.form-group.full {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 8px rgba(240, 165, 0, 0.15);
+}
+
+.form-group textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+.gantt-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: auto;
+    margin-bottom: 14px;
+}
+
+.gantt-chart {
+    min-width: 800px;
+}
+
+.gantt-hrow {
+    display: flex;
+    background: var(--primary);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    border-bottom: 2px solid var(--secondary);
+}
+
+.gantt-hcell {
+    padding: 8px 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--secondary);
+    text-align: center;
+    border-right: 1px solid rgba(42, 74, 106, 0.5);
+    flex-shrink: 0;
+}
+
+.gantt-hcell.name { min-width: 180px; text-align: right; padding-right: 10px; }
+.gantt-hcell.info { min-width: 65px; }
+.gantt-hcell.day { min-width: 34px; }
+
+.gantt-row {
+    display: flex;
+    border-bottom: 1px solid rgba(42, 74, 106, 0.3);
+    min-height: 34px;
+    align-items: stretch;
+}
+
+.gantt-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.gantt-cell {
+    padding: 3px;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid rgba(42, 74, 106, 0.2);
+    flex-shrink: 0;
+    justify-content: center;
+}
+
+.gantt-cell.name { min-width: 180px; justify-content: flex-start; padding-right: 10px; font-weight: 600; }
+.gantt-cell.info { min-width: 65px; }
+.gantt-cell.day { min-width: 34px; position: relative; }
+.gantt-cell.weekend { background: rgba(239, 68, 68, 0.06); }
+.gantt-cell.today { background: rgba(240, 165, 0, 0.1); }
+
+.gantt-bar {
+    position: absolute;
+    top: 5px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+    color: #fff;
+    z-index: 2;
+    min-width: 20px;
+    padding: 0 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: var(--transition);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gantt-bar:hover {
+    opacity: 0.85;
+    z-index: 5;
+    transform: scaleY(1.4);
+}
+
+.daily-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.daily-card:hover {
+    border-color: var(--secondary);
+    box-shadow: var(--shadow-md);
+}
+
+.daily-card.selected {
+    border-color: var(--success);
+    border-width: 2px;
+    background: #1a2d40;
+}
+
+.daily-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.daily-card .card-date {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+.daily-card .card-project {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.daily-card .card-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 10px;
+}
+
+.daily-card .card-detail-item label {
+    color: var(--text-secondary);
+    font-size: 8px;
+    display: block;
+}
+
+.daily-card .card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.staff-profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    transition: var(--transition);
+}
+
+.staff-profile-card:hover {
+    border-color: var(--secondary);
+    box-shadow: var(--shadow-sm);
+}
+
+.staff-avatar-large {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.staff-avatar-large.contractor-avatar {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.staff-avatar-large.supervisor-avatar {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.attendance-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 6px;
+    margin: 8px 0;
+}
+
+.attendance-stat {
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    text-align: center;
+}
+
+.attendance-stat .stat-val {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--secondary);
+}
+
+.attendance-stat .stat-lbl {
+    font-size: 7px;
+    color: var(--text-secondary);
+}
+
+.summary-panel {
+    display: none;
+    margin-bottom: 16px;
+}
+
+.summary-panel.show {
+    display: block;
+}
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    align-items: center;
+}
+
+.toolbar .toolbar-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-left: auto;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+    background: var(--secondary);
+    color: #000;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    transform: translateY(120px);
+    opacity: 0;
+    transition: var(--transition);
+    box-shadow: var(--shadow-lg);
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-group.full {
+        grid-column: span 1;
+    }
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .kpi-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dash-header {
+        height: auto;
+        padding: 10px;
+        gap: 8px;
+    }
+    .dash-header h1 {
+        font-size: 13px;
+    }
+}
+/* ═══════════════ شعار الصورة الرسمي ═══════════════ */
+.login-logo-container {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 15px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1a3a5c;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.login-logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* شعار مصغر للهيدر */
+.header-logo-container {
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    border-radius: 6px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f0a500;
+    flex-shrink: 0;
+}
+
+.header-logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+<div class="screen active" id="screen-login">
+    <div class="login-box">
+        <div class="logo">
+ 
+           <div class="login-logo-container">
+    <img src="logo.png" alt="شعار وزارة الأشغال العامة والإسكان">
+</div>
+
+            <h2>نظام متابعة مشاريع الطرق</h2>
+            <div class="subtitle">المملكة الأردنية الهاشمية</div>
+            <div class="ministry-name">وزارة الأشغال العامة والإسكان</div>
+        </div>
+        <div class="form-group">
+            <label>🎯 نوع المستخدم</label>
+            <select id="loginRole" onchange="autoFill()">
+                <option value="">اختر نوع المستخدم</option>
+                <option value="manager">👑 مدير المشروع</option>
+                <option value="engineer">👷 مهندس مشرف</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>👤 اسم المستخدم</label>
+            <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم">
+        </div>
+        <div class="form-group">
+            <label>🔒 كلمة المرور</label>
+            <input type="password" id="loginPass" value="1234" placeholder="أدخل كلمة المرور">
+        </div>
+        <button class="login-btn btn-primary" onclick="doLogin()" style="width:100%;padding:12px;font-size:14px;">
+            🚀 تسجيل الدخول
+        </button>
+        <div class="login-error" id="loginError" style="display:none;color:#ef4444;text-align:center;margin-top:10px;padding:8px;background:rgba(239,68,68,0.1);border-radius:6px;font-size:11px;"></div>
+    </div>
+</div>
+
+<!-- ═══════════════ DASHBOARD SCREEN ═══════════════ -->
+<div class="screen dashboard-screen" id="screen-dashboard">
+    <div class="dash-header">
+        <div class="header-left">
+            
+            <div class="header-logo-container">
+    <img src="logo.png" alt="شعار الوزارة">
+</div>
+
+            <h1>🛣️ نظام متابعة مشاريع الطرق</h1>
+        </div>
+        <div class="header-right">
+            <span id="dashUserName" style="font-weight:700;">—</span>
+            <button class="btn btn-outline btn-sm" onclick="toggleSummary()">📊 ملخص المشاريع</button>
+            <button class="btn btn-success btn-sm" onclick="saveData()">💾 حفظ البيانات</button>
+            <button class="btn btn-purple btn-sm" onclick="loadDemo()">📥 تحميل 10 مشاريع</button>
+            <button class="btn btn-danger btn-sm" onclick="logout()">🚪 تسجيل خروج</button>
+        </div>
+    </div>
+    <div class="dash-content">
+        <div class="stats-row" id="statsRow"></div>
+        <div class="summary-panel" id="summaryPanel">
+            <h3 style="color:#f0a500;margin-bottom:10px;">📊 ملخص المشاريع</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>المشروع</th>
+                            <th>المحافظة</th>
+                            <th>المقاول</th>
+                            <th>نسبة الإنجاز</th>
+                            <th>الحالة</th>
+                            <th>مشكلات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <h3 style="color:#f0a500;margin-bottom:10px;">📂 صفحات النظام</h3>
+        <div class="dash-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+            <div class="dash-card stat-card" onclick="openPage('projects')"><div style="font-size:28px;">🏗️</div><div style="font-size:11px;font-weight:700;">المشاريع</div></div>
+            <div class="dash-card stat-card" onclick="openPage('gantt')"><div style="font-size:28px;">📅</div><div style="font-size:11px;font-weight:700;">الجدول الزمني</div></div>
+            <div class="dash-card stat-card" onclick="openPage('daily')"><div style="font-size:28px;">📋</div><div style="font-size:11px;font-weight:700;">التقارير اليومية</div></div>
+            <div class="dash-card stat-card" onclick="openPage('staff')"><div style="font-size:28px;">👷</div><div style="font-size:11px;font-weight:700;">كادر المقاول</div></div>
+            <div class="dash-card stat-card" onclick="openPage('supervisor')"><div style="font-size:28px;">👤</div><div style="font-size:11px;font-weight:700;">كادر الإشراف</div></div>
+            <div class="dash-card stat-card" onclick="openPage('attendance')"><div style="font-size:28px;">✅</div><div style="font-size:11px;font-weight:700;">داشبورد الدوام</div></div>
+            <div class="dash-card stat-card" onclick="openPage('quality')"><div style="font-size:28px;">🔬</div><div style="font-size:11px;font-weight:700;">الفحوصات</div></div>
+            <div class="dash-card stat-card" onclick="openPage('kpi')"><div style="font-size:28px;">📊</div><div style="font-size:11px;font-weight:700;">مؤشرات KPI</div></div>
+            <div class="dash-card stat-card" onclick="openPage('issues')"><div style="font-size:28px;">⚠️</div><div style="font-size:11px;font-weight:700;">المشكلات</div></div>
+            <div class="dash-card stat-card" onclick="openPage('visits')"><div style="font-size:28px;">🔍</div><div style="font-size:11px;font-weight:700;">الزيارات الميدانية</div></div>
+            <div class="dash-card stat-card" onclick="openPage('export')"><div style="font-size:28px;">📤</div><div style="font-size:11px;font-weight:700;">التقارير والتصدير</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ CONTENT SCREEN ═══════════════ -->
+<div class="screen content-screen" id="screen-content">
+    <div class="content-header" style="background:#162d45;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="goDashboard()">← لوحة التحكم</button>
+        <h3 id="contentTitle" style="font-size:15px;font-weight:700;">—</h3>
+        <div id="contentActions"></div>
+    </div>
+    <div class="content-body" id="contentBody" style="flex:1;padding:16px;overflow-y:auto;"></div>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<div class="modal-overlay" id="modal_project">
+    <div class="modal">
+        <div class="modal-title">🏗️ إضافة / تعديل مشروع</div>
+        <div class="form-grid">
+            <div class="form-group full"><label>اسم المشروع *</label><input id="f_pname"></div>
+            <div class="form-group"><label>رقم العقد</label><input id="f_pcontract"></div>
+            <div class="form-group"><label>المحافظة</label><select id="f_pprovince"><option value="">اختر المحافظة</option><option>عمان</option><option>إربد</option><option>الزرقاء</option><option>البلقاء</option><option>المفرق</option><option>جرش</option><option>عجلون</option><option>الكرك</option><option>الطفيلة</option><option>معان</option><option>العقبة</option><option>مادبا</option></select></div>
+            <div class="form-group"><label>الموقع</label><input id="f_ploc"></div>
+            <div class="form-group"><label>المقاول</label><input id="f_pcontractor"></div>
+            <div class="form-group"><label>الاستشاري</label><input id="f_pconsultant"></div>
+            <div class="form-group"><label>المهندس المشرف</label><input id="f_psup"></div>
+            <div class="form-group"><label>الطول (كم)</label><input type="number" id="f_plen" step="0.1" min="0"></div>
+            <div class="form-group"><label>تاريخ المباشرة</label><input type="date" id="f_pstart"></div>
+            <div class="form-group"><label>تاريخ الانتهاء المتوقع</label><input type="date" id="f_pend"></div>
+            <div class="form-group"><label>الميزانية (دينار)</label><input type="number" id="f_pbudget" min="0"></div>
+            <div class="form-group"><label>نسبة الإنجاز %</label><input type="number" id="f_pprog" value="0" min="0" max="100"></div>
+            <div class="form-group"><label>الحالة</label><select id="f_pstat"><option>نشط</option><option>متوقف</option><option>منجز</option><option>مخطط</option></select></div>
+        </div>
+        <input type="hidden" id="f_pid">
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_project')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveProject()">💾 حفظ المشروع</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal_staff">
+    <div class="modal">
+        <div class="modal-title">👷 إضافة / تعديل كادر</div>
+        <div class="form-grid">
+            <div class="form-group full"><label>الاسم *</label><input id="f_sf_name"></div>
+            <div class="form-group"><label>المسمى الوظيفي</label><select id="f_sf_role"><option value="">اختر</option><option>مدير مشروع</option><option>مهندس مدني</option><option>مهندس طرق</option><option>مهندس جودة</option><option>مهندس سلامة</option><option>مساح</option><option>مراقب طرق</option><option>مراقب خرسانة</option><option>فني مختبر تربة</option><option>فني مختبر أسفلت</option><option>مشرف عمال</option><option>عامل</option><option>سائق</option><option>مشغل معدة</option></select></div>
+            <div class="form-group"><label>نوع الكادر</label><select id="f_sf_type"><option>مقاول</option><option>إشراف</option></select></div>
+            <div class="form-group"><label>المشروع</label><select id="f_sf_proj"><option value="">اختر مشروعاً</option></select></div>
+            <div class="form-group"><label>الجهة</label><select id="f_sf_entity"><option>الوزارة</option><option>الاستشاري</option><option>المقاول</option></select></div>
+            <div class="form-group"><label>رقم الجوال</label><input id="f_sf_phone"></div>
+            <div class="form-group"><label>البريد الإلكتروني</label><input id="f_sf_email" type="email"></div>
+            <div class="form-group"><label>الجنسية</label><input id="f_sf_nationality" value="أردني"></div>
+            <div class="form-group"><label>التخصص</label><input id="f_sf_specialty"></div>
+            <div class="form-group"><label>سنوات الخبرة</label><input type="number" id="f_sf_experience" value="0" min="0"></div>
+            <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="f_sf_hire_date"></div>
+            <div class="form-group"><label>ساعات العمل اليومية</label><input type="number" id="f_sf_work_hours" value="8" min="1" max="16"></div>
+        </div>
+        <input type="hidden" id="f_sf_id">
+        <input type="hidden" id="f_sf_data_key">
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_staff')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveStaff()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal_attendance">
+    <div class="modal">
+        <div class="modal-title">✅ تسجيل دوام</div>
+        <div class="form-grid">
+            <div class="form-group"><label>الكادر</label><select id="f_att_staff"><option value="">اختر</option></select></div>
+            <div class="form-group"><label>التاريخ</label><input type="date" id="f_att_date"></div>
+            <div class="form-group"><label>وقت الحضور</label><input type="time" id="f_att_in"></div>
+            <div class="form-group"><label>وقت الانصراف</label><input type="time" id="f_att_out"></div>
+            <div class="form-group"><label>ساعات فعلية</label><input type="number" id="f_att_hours" step="0.5" value="8" min="0"></div>
+            <div class="form-group"><label>الحالة</label><select id="f_att_status"><option>حاضر</option><option>متأخر</option><option>غائب</option><option>إجازة</option><option>مريض</option></select></div>
+            <div class="form-group full"><label>ملاحظات</label><textarea id="f_att_notes"></textarea></div>
+        </div>
+        <input type="hidden" id="f_att_edit_id">
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_attendance')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveAttendance()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal_quality">
+    <div class="modal">
+        <div class="modal-title">🔬 فحص</div>
+        <div class="form-grid">
+            <div class="form-group"><label>المشروع</label><select id="f_qproj" onchange="updateQualityItems()"><option value="">اختر</option></select></div>
+            <div class="form-group"><label>البند</label><select id="f_qitem"><option value="">اختر</option></select></div>
+            <div class="form-group"><label>نوع الفحص</label><input id="f_qtype" placeholder="CBR / بروكتور / كثافة..."></div>
+            <div class="form-group"><label>التاريخ</label><input type="date" id="f_qdate"></div>
+            <div class="form-group"><label>النتيجة</label><input id="f_qresult"></div>
+            <div class="form-group"><label>الحالة</label><select id="f_qstatus"><option>مطابق</option><option>غير مطابق</option><option>قيد الفحص</option></select></div>
+            <div class="form-group full"><label>ملاحظات</label><textarea id="f_qnotes"></textarea></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_quality')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveQuality()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal_visit">
+    <div class="modal">
+        <div class="modal-title">🔍 تقرير زيارة ميدانية</div>
+        <div class="form-grid">
+            <div class="form-group"><label>المشروع *</label><select id="f_vproj"><option value="">اختر</option></select></div>
+            <div class="form-group"><label>التاريخ</label><input type="date" id="f_vdate"></div>
+            <div class="form-group"><label>وقت الزيارة</label><input type="time" id="f_vtime"></div>
+            <div class="form-group"><label>المفتش / الزائر</label><input id="f_vinsp"></div>
+            <div class="form-group"><label>الجهة التابع لها</label><input id="f_vdept"></div>
+            <div class="form-group"><label>نوع الزيارة</label><select id="f_vtype"><option>دورية</option><option>طارئة</option><option>تفتيش سلامة</option><option>تقييم تقدم</option></select></div>
+            <div class="form-group full"><label>الموقع / الكم</label><input id="f_vloc"></div>
+            <div class="form-group"><label>نسبة الإنجاز الملاحظة</label><input type="number" id="f_vprog" min="0" max="100"></div>
+            <div class="form-group"><label>عدد العمالة</label><input type="number" id="f_vworkers" min="0"></div>
+            <div class="form-group"><label>المعدات في الموقع</label><input id="f_vequip"></div>
+            <div class="form-group"><label>حالة الطقس</label><select id="f_vweather"><option>صحو</option><option>غائم</option><option>ممطر</option></select></div>
+            <div class="form-group full"><label>الأعمال الجاري تنفيذها</label><textarea id="f_vcurrent"></textarea></div>
+            <div class="form-group full"><label>الملاحظات والمشاهدات</label><textarea id="f_vnotes"></textarea></div>
+            <div class="form-group"><label>التقييم العام</label><select id="f_vrating"><option>ممتاز</option><option>جيد جداً</option><option>جيد</option><option>مقبول</option><option>ضعيف</option></select></div>
+            <div class="form-group"><label>الالتزام بالبرنامج</label><select id="f_vschedule"><option>متقدم</option><option>حسب البرنامج</option><option>متأخر قليلاً</option><option>متأخر كثيراً</option></select></div>
+            <div class="form-group"><label>الالتزام بالمواصفات</label><select id="f_vspecs"><option>ممتاز</option><option>جيد</option><option>مقبول</option><option>ضعيف</option></select></div>
+            <div class="form-group"><label>الالتزام بالسلامة</label><select id="f_vsafety"><option>ممتاز</option><option>جيد</option><option>مقبول</option><option>ضعيف</option></select></div>
+            <div class="form-group full"><label>التوصيات والقرارات المطلوبة</label><textarea id="f_vrec"></textarea></div>
+            <div class="form-group"><label>معد التقرير</label><input id="f_vreporter"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_visit')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveVisit()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal_daily_report">
+    <div class="modal">
+        <div class="modal-title">📝 تقرير يومي</div>
+        <div class="form-grid">
+            <div class="form-group"><label>المشروع *</label><select id="f_dr_proj"><option value="">اختر</option></select></div>
+            <div class="form-group"><label>التاريخ</label><input type="date" id="f_dr_date"></div>
+            <div class="form-group full"><label>📍 موقع العمل</label><input id="f_dr_loc" placeholder="الكم..."></div>
+            <div class="form-group full"><label>🔧 نوع العمل المنفذ</label><input id="f_dr_work" placeholder="وصف العمل..."></div>
+            <div class="form-group"><label>📦 الكمية المنفذة</label><input id="f_dr_qty" placeholder="م³، طن..."></div>
+            <div class="form-group"><label>🚜 المعدات</label><input id="f_dr_equip" placeholder="جريدر، رصاصة..."></div>
+            <div class="form-group"><label>👷 العمالة</label><input type="number" id="f_dr_workers" placeholder="عدد العمال" min="0"></div>
+            <div class="form-group"><label>🌤️ الطقس</label><select id="f_dr_weather"><option>صحو</option><option>غائم</option><option>ممطر</option><option>عاصف</option><option>حار جداً</option></select></div>
+            <div class="form-group"><label>📊 نسبة الإنجاز %</label><input type="number" id="f_dr_progress" min="0" max="100" placeholder="0-100"></div>
+            <div class="form-group full"><label>📝 ملاحظات</label><textarea id="f_dr_notes" placeholder="أي ملاحظات إضافية..."></textarea></div>
+        </div>
+        <input type="hidden" id="f_dr_id">
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_daily_report')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveDailyReport()">💾 حفظ التقرير</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal_timeline">
+    <div class="modal">
+        <div class="modal-title">📅 مهمة زمنية</div>
+        <div class="form-grid">
+            <div class="form-group"><label>المشروع</label><select id="f_tproj"><option value="">اختر</option></select></div>
+            <div class="form-group full"><label>اسم المهمة *</label><input id="f_tname"></div>
+            <div class="form-group"><label>المدة (أيام)</label><input type="number" id="f_tdur" value="1" min="1"></div>
+            <div class="form-group"><label>تاريخ البدء</label><input type="date" id="f_tstart"></div>
+            <div class="form-group"><label>النوع</label><input id="f_ttype" placeholder="ترابية، أساس، أسفلت..."></div>
+            <div class="form-group"><label>الحالة</label><select id="f_tstat"><option>لم تبدأ</option><option>قيد التنفيذ</option><option>مكتملة</option><option>متأخرة</option></select></div>
+            <div class="form-group"><label>الإنجاز %</label><input type="number" id="f_tprog" value="0" min="0" max="100"></div>
+            <div class="form-group"><label>اللون</label><input type="color" id="f_tcolor" value="#3b82f6"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_timeline')">إلغاء</button>
+            <button class="btn btn-primary" onclick="addTimeline()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for editing quality status -->
+<div class="modal-overlay" id="modal_quality_edit">
+    <div class="modal">
+        <div class="modal-title">✏️ تعديل حالة الفحص</div>
+        <div class="form-grid">
+            <div class="form-group full"><label>حالة الفحص</label><select id="f_qe_status"><option>مطابق</option><option>غير مطابق</option><option>قيد الفحص</option></select></div>
+            <div class="form-group full"><label>ملاحظات التعديل</label><textarea id="f_qe_notes" placeholder="سبب التعديل..."></textarea></div>
+        </div>
+        <input type="hidden" id="f_qe_id">
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal_quality_edit')">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveQualityEdit()">💾 حفظ التعديل</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════ GLOBAL STATE ═══════════════ */
+var currentUser = null;
+var currentPage = null;
+var currentGanttPid = null;
+
+/* ═══════════════ DATA STORE ═══════════════ */
+var D = {
+    projects: [],
+    dailyLogs: [],
+    timelineTasks: [],
+    visits: [],
+    issues: [],
+    boqItems: [],
+    contractorStaff: [],
+    supervisorStaff: [],
+    attendanceRecords: [],
+    qualityChecks: []
+};
+
+/* ═══════════════ DATA LINKING & AUTO-SYNC ═══════════════ */
+function syncAllData() {
+    D.projects.forEach(function(p) {
+        D.dailyLogs.forEach(function(d) { if (d.projectId == p.id) d.projectName = p.name; });
+        D.timelineTasks.forEach(function(t) { if (t.projectId == p.id) t.projectName = p.name; });
+        D.issues.forEach(function(i) { if (i.projectId == p.id) i.projectName = p.name; });
+        D.visits.forEach(function(v) { if (v.projectId == p.id) v.projectName = p.name; });
+    });
+
+    var allStaff = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+    D.attendanceRecords.forEach(function(a) {
+        var s = allStaff.find(function(x) { return x.id == a.staffId; });
+        if (s) a.staffName = s.name;
+    });
+
+    D.projects.forEach(function(p) {
+        var latestReport = D.dailyLogs
+            .filter(function(d) { return d.projectId == p.id && d.progress; })
+            .sort(function(a, b) { return b.date.localeCompare(a.date); })[0];
+        if (latestReport) {
+            p.progress = parseInt(latestReport.progress) || p.progress;
+        }
+    });
+
+    D.boqItems.forEach(function(b) {
+        if (b.executedQty >= b.plannedQty && b.plannedQty > 0) {
+            b.status = 'مكتمل';
+        } else if (b.executedQty > 0) {
+            b.status = b.status == 'مكتمل' ? 'قيد التنفيذ' : b.status;
+        }
+    });
+}
+
+/* ═══════════════ HELPERS ═══════════════ */
+function g(id) { return document.getElementById(id); }
+
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function toast(msg) {
+    var t = g('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+function today() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function parseDate(d) {
+    var p = d.split('-');
+    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+}
+
+function formatDate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function daysBetween(d1, d2) {
+    return Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+
+/* ═══════════════ PERSISTENCE ═══════════════ */
+function saveData() {
+    try {
+        syncAllData();
+        localStorage.setItem('roads_full_v6', JSON.stringify(D));
+        toast('💾 تم حفظ جميع البيانات بنجاح');
+    } catch (e) {
+        toast('⚠️ فشل الحفظ - قد تكون الذاكرة ممتلئة');
+    }
+}
+
+function silentSave() {
+    try {
+        syncAllData();
+        localStorage.setItem('roads_full_v6', JSON.stringify(D));
+    } catch (e) {}
+}
+
+function loadData() {
+    try {
+        var s = localStorage.getItem('roads_full_v6');
+        if (s) {
+            var p = JSON.parse(s);
+            Object.keys(p).forEach(function(k) {
+                if (D[k] !== undefined) D[k] = p[k];
+            });
+            syncAllData();
+        }
+    } catch (e) {}
+}
+
+/* ═══════════════ AUTH ═══════════════ */
+function autoFill() {
+    var r = g('loginRole').value;
+    g('loginUser').value = r === 'manager' ? 'admin' : r === 'engineer' ? 'engineer' : '';
+}
+
+function doLogin() {
+    var u = g('loginUser').value.trim();
+    var p = g('loginPass').value.trim();
+    var r = g('loginRole').value;
+    var err = g('loginError');
+    err.style.display = 'none';
+
+    if (!u || !p || !r) {
+        err.textContent = '❌ يرجى إكمال جميع الحقول';
+        err.style.display = 'block';
+        return;
+    }
+
+    if ((r === 'manager' && u === 'admin' && p === '1234') ||
+        (r === 'engineer' && u === 'engineer' && p === '1234')) {
+        currentUser = {
+            username: u,
+            name: r === 'manager' ? 'مدير المشروع' : 'مهندس مشرف',
+            role: r
+        };
+        showScreen('dashboard');
+        g('dashUserName').textContent = currentUser.name;
+        loadData();
+        syncAllData();
+        updateDashboard();
+        renderSummary();
+        toast('✅ مرحباً ' + currentUser.name + ' - تم تسجيل الدخول بنجاح');
+    } else {
+        err.textContent = '❌ بيانات الدخول غير صحيحة - يرجى المحاولة مرة أخرى';
+        err.style.display = 'block';
+    }
+}
+
+function logout() {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        saveData();
+        currentUser = null;
+        showScreen('login');
+        toast('👋 تم تسجيل الخروج');
+    }
+}
+
+/* ═══════════════ NAVIGATION ═══════════════ */
+function showScreen(n) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    g('screen-' + n).classList.add('active');
+}
+
+function goDashboard() {
+    showScreen('dashboard');
+    syncAllData();
+    updateDashboard();
+    renderSummary();
+}
+
+function toggleSummary() {
+    var p = g('summaryPanel');
+    p.classList.toggle('show');
+    if (p.classList.contains('show')) renderSummary();
+}
+
+/* ═══════════════ MODALS ═══════════════ */
+function openModal(id) {
+    if (id === 'modal_staff') updateSelects('f_sf_proj');
+    if (id === 'modal_attendance') { updateAttSelect(); g('f_att_edit_id').value = ''; }
+    if (id === 'modal_quality') updateSelects('f_qproj');
+    if (id === 'modal_visit') updateSelects('f_vproj');
+    if (id === 'modal_timeline') updateSelects('f_tproj');
+    if (id === 'modal_daily_report') updateSelects('f_dr_proj');
+    g(id).classList.add('open');
+}
+
+function closeModal(id) {
+    g(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(function(m) {
+    m.addEventListener('click', function(e) { if (e.target === m) m.classList.remove('open'); });
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(function(m) { m.classList.remove('open'); });
+});
+
+function updateSelects(id) {
+    var sel = g(id);
+    if (!sel) return;
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">اختر مشروعاً</option>';
+    D.projects.forEach(function(p) {
+        sel.innerHTML += '<option value="' + p.id + '">' + esc(p.name) + '</option>';
+    });
+    if (cur) sel.value = cur;
+}
+
+function updateAttSelect() {
+    var sel = g('f_att_staff');
+    if (!sel) return;
+    var all = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+    sel.innerHTML = '<option value="">اختر الكادر</option>';
+    all.forEach(function(s) {
+        sel.innerHTML += '<option value="' + s.id + '">' + esc(s.name) + ' - ' + esc(s.role || '') + '</option>';
+    });
+}
+
+/* ═══════════════ PAGE RENDERING ═══════════════ */
+function openPage(page) {
+    currentPage = page;
+    showScreen('content');
+    var titles = {
+        projects: '🏗️ المشاريع',
+        gantt: '📅 الجدول الزمني',
+        daily: '📋 التقارير اليومية',
+        staff: '👷 كادر المقاول',
+        supervisor: '👤 كادر الإشراف',
+        attendance: '✅ داشبورد الدوام',
+        quality: '🔬 الفحوصات',
+        kpi: '📊 مؤشرات KPI',
+        issues: '⚠️ المشكلات',
+        visits: '🔍 الزيارات الميدانية',
+        export: '📤 التقارير والتصدير'
+    };
+    g('contentTitle').textContent = titles[page] || page;
+    g('contentActions').innerHTML = '';
+    g('contentBody').innerHTML = renderPage(page);
+}
+
+function renderPage(page) {
+    var renderers = {
+        projects: renderProjects,
+        gantt: renderGantt,
+        daily: renderDailyReports,
+        staff: function() { return renderStaffPage('contractorStaff', '👷 كادر المقاول', 'مقاول'); },
+        supervisor: function() { return renderStaffPage('supervisorStaff', '👤 كادر الإشراف', 'إشراف'); },
+        attendance: renderAttendanceDash,
+        quality: renderQualityPage,
+        kpi: renderKPIPage,
+        issues: renderIssuesPage,
+        visits: renderVisitsPage,
+        export: renderExport
+    };
+    return (renderers[page] || function() { return '<div class="empty-message">قيد التطوير</div>'; })();
+}
+function buildSpeedometer(percentage, size) {
+    size = size || 140;
+    var center = size / 2;
+    var radius = center - 15;
+    var circumference = 2 * Math.PI * radius;
+    var normalizedPct = Math.min(100, Math.max(0, percentage));
+    var arcLength = circumference * 0.75;
+    var dashOffset = circumference - (normalizedPct / 100) * arcLength;
+    var color = normalizedPct >= 70 ? '#22c55e' : normalizedPct >= 40 ? '#f59e0b' : '#ef4444';
+
+    var svg = '<svg class="speedometer-svg" viewBox="0 0 ' + size + ' ' + size + '" style="width:' + size + 'px;height:' + size + 'px;">';
+    svg += '<circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="none" stroke="var(--bg-input)" stroke-width="12"/>';
+    svg += '<circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="none" stroke="' + color + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + arcLength + ' ' + circumference + '" stroke-dashoffset="' + dashOffset + '"/>';
+    svg += '</svg>';
+
+    return '<div class="speedometer-container">' + svg +
+        '<div class="speedometer-value">' + normalizedPct + '<span class="unit">%</span></div>' +
+        '</div>';
+}
+
+/* ═══════════════ COUNTER DIGITS ═══════════════ */
+function buildCounter(num, pad) {
+    pad = pad || 2;
+    var digits = String(num).padStart(pad, '0').split('');
+    return '<div class="counter-box">' + digits.map(function(d) {
+        return '<div class="counter-digit">' + d + '</div>';
+    }).join('') + '</div>';
+}
+
+/* ═══════════════ PRINT HEADER & FOOTER ═══════════════ */
+function getPrintHeaderHTML(title) {
+    return '<div style="background:linear-gradient(135deg,#1a3a5c,#0f2847);color:#fff;padding:20px;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;gap:15px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">'+
+        '<div style="background:#fff;border-radius:8px;padding:8px;text-align:center;flex-shrink:0;"><div style="font-size:28px;color:#f0a500;">👑</div><div style="font-size:6px;color:#1a3a5c;">الاشغال</div></div>'+
+        '<div><div style="font-size:11px;color:#f0a500;font-weight:700;">وزارة الأشغال العامة والإسكان - المملكة الأردنية الهاشمية</div>'+
+        '<h2 style="font-size:18px;margin:5px 0;color:#fff;">' + title + '</h2><div style="font-size:9px;opacity:0.7;">تاريخ الإصدار: ' + new Date().toLocaleDateString('ar-SA') + '</div></div></div>';
+}
+
+function getPrintFooterHTML() {
+    return '<div style="background:#1a3a5c;color:#fff;padding:15px;border-radius:8px;margin-top:20px;text-align:center;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">👑 © ' + new Date().getFullYear() + ' وزارة الأشغال العامة والإسكان - جميع الحقوق محفوظة 👑</div>';
+}
+
+
+/* ═══════════════ SINGLE WINDOW PRINT - WITH CHART SUPPORT ═══════════════ */
+var _printWindow = null;
+
+function printElement(elId, title) {
+    var el = g(elId);
+    if (!el) { toast('⚠️ لم يتم العثور على المحتوى'); return; }
+    
+    if (_printWindow && !_printWindow.closed) {
+        _printWindow.close();
+    }
+    
+    // استنساخ العنصر
+    var clone = el.cloneNode(true);
+    
+    // إخفاء الأزرار
+    clone.querySelectorAll('button, .btn, .card-actions, input[type=date]').forEach(function(b) { 
+        b.style.display = 'none'; 
+    });
+    
+    // تحويل جميع canvas إلى صور باستخدام canvas الأصلية الحية
+    var originalCanvases = el.querySelectorAll('canvas');
+    var clonedCanvases = clone.querySelectorAll('canvas');
+    
+    originalCanvases.forEach(function(origCanvas, index) {
+        if (clonedCanvases[index]) {
+            try {
+                var img = document.createElement('img');
+                img.src = origCanvas.toDataURL('image/png');
+                img.style.width = '100%';
+                img.style.height = 'auto';
+                img.style.maxWidth = '650px';
+                img.style.display = 'block';
+                img.style.margin = '0 auto';
+                clonedCanvases[index].parentNode.replaceChild(img, clonedCanvases[index]);
+            } catch(e) {
+                console.log('Canvas error:', e);
+            }
+        }
+    });
+    
+    _printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!_printWindow) { 
+        toast('⚠️ يرجى السماح بالنوافذ المنبثقة للطباعة'); 
+        return; 
+    }
+    
+    var printContent = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + title + '</title>' +
+        '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">' +
+        '<style>' +
+        'body{font-family:"Cairo",sans-serif;direction:rtl;padding:25px;color:#1a1a2e;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+        'table{width:100%;border-collapse:collapse;margin:10px 0;}th{background:#1a3a5c!important;color:#f0a500!important;padding:10px;font-size:10px;border:1px solid #ddd;}' +
+        'td{padding:8px;border:1px solid #ddd;font-size:9px;color:#1a1a2e;}' +
+        '.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8px;font-weight:700;}' +
+        '.badge-green{background:#d1fae5!important;color:#065f46!important;border:1px solid #6ee7b7!important;}' +
+        '.badge-red{background:#fee2e2!important;color:#991b1b!important;border:1px solid #fca5a5!important;}' +
+        '.badge-yellow{background:#fef3c7!important;color:#92400e!important;border:1px solid #fcd34d!important;}' +
+        '.badge-blue{background:#dbeafe!important;color:#1e40af!important;border:1px solid #93c5fd!important;}' +
+        '.progress-bar{background:#e5e7eb!important;border-radius:99px;height:8px;overflow:hidden;border:1px solid #d1d5db;}' +
+        '.progress-fill{height:100%;border-radius:99px;}' +
+        '.prog-green{background:#22c55e!important;}.prog-yellow{background:#f59e0b!important;}.prog-red{background:#ef4444!important;}' +
+        '.kpi-dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px;}' +
+        '.kpi-card{background:#fff!important;border:1px solid #e5e7eb!important;padding:16px;text-align:center;page-break-inside:avoid;}' +
+        '.chart-box{background:#fff!important;border:1px solid #e5e7eb!important;padding:10px;text-align:center;page-break-inside:avoid;}' +
+        '.chart-box img{max-width:100%;height:auto;}' +
+        '.speedometer-container{text-align:center;display:inline-block;}' +
+        '.speedometer-svg{width:140px;height:140px;}' +
+        '.counter-box{direction:ltr!important;display:inline-flex!important;}' +
+        '.counter-digit{background:#f0f4f8!important;border:2px solid #d1d5db!important;color:#1a3a5c!important;}' +
+        '.gantt-container{overflow:visible;}' +
+        '.gantt-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+        '.daily-card,.staff-profile-card{background:#fff!important;border:1px solid #e5e7eb!important;margin-bottom:10px;padding:12px;page-break-inside:avoid;}' +
+        '.print-header{background:linear-gradient(135deg,#1a3a5c,#0f2847)!important;color:#fff!important;padding:20px!important;border-radius:10px!important;margin-bottom:20px!important;display:flex;align-items:center;gap:15px;}' +
+        '.print-header *{color:#fff!important;}' +
+        '.gold-text{color:#f0a500!important;}' +
+        '.print-footer{background:#1a3a5c!important;color:#fff!important;padding:15px!important;border-radius:10px!important;margin-top:20px!important;text-align:center!important;font-size:10px;}' +
+        '.trend-box{display:inline-block;padding:8px 14px;border-radius:8px;font-weight:700;}' +
+        '.trend-box.up{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}' +
+        '.trend-box.stable{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}' +
+        '.trend-box.down{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}' +
+        '@page{margin:1.5cm;size:A4;}' +
+        '<\/style><\/head><body>';
+    
+    printContent += getPrintHeaderHTML(title);
+    printContent += '<div style="background:#fff;">' + clone.outerHTML + '</div>';
+    printContent += getPrintFooterHTML();
+    printContent += '<\/body><\/html>';
+    
+    _printWindow.document.write(printContent);
+    _printWindow.document.close();
+    
+    _printWindow.onload = function() {
+        setTimeout(function() {
+            _printWindow.print();
+        }, 1000);
+    };
+}
+
+
+/* ═══════════════ PRINT GANTT CHART - FIXED BARS ═══════════════ */
+function printGanttChart(elId, title) {
+    var el = g(elId);
+    if (!el) { toast('⚠️ لم يتم العثور على المحتوى'); return; }
+    
+    if (_printWindow && !_printWindow.closed) {
+        _printWindow.close();
+    }
+    
+    // بدلاً من استنساخ العنصر، سنبني المخطط يدوياً للطباعة
+    var ganttRows = el.querySelectorAll('.gantt-row');
+    var ganttHeader = el.querySelector('.gantt-hrow');
+    var ganttLegend = el.querySelector('.gantt-legend');
+    
+    if (!ganttRows.length) { toast('⚠️ لا توجد بيانات في المخطط'); return; }
+    
+    // جمع بيانات الرأس
+    var headerHTML = '';
+    if (ganttHeader) {
+        headerHTML = '<div class="gantt-hrow">' + ganttHeader.innerHTML + '</div>';
+    }
+    
+    // بناء صفوف المخطط مع الأشرطة
+    var rowsHTML = '';
+    ganttRows.forEach(function(row) {
+        var rowClone = row.cloneNode(true);
+        // إخفاء الأزرار
+        rowClone.querySelectorAll('button, .btn').forEach(function(b) { b.style.display = 'none'; });
+        rowsHTML += '<div class="gantt-row">' + rowClone.innerHTML + '</div>';
+    });
+    
+    // الأسطورة
+    var legendHTML = '';
+    if (ganttLegend) {
+        legendHTML = '<div class="gantt-legend">' + ganttLegend.innerHTML + '</div>';
+    }
+    
+    _printWindow = window.open('', '_blank', 'width=1100,height=700');
+    if (!_printWindow) { 
+        toast('⚠️ يرجى السماح بالنوافذ المنبثقة للطباعة'); 
+        return; 
+    }
+    
+    _printWindow.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + title + '</title>' +
+        '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">' +
+        '<style>' +
+        '*{box-sizing:border-box;margin:0;padding:0;}' +
+        'body{font-family:"Cairo",sans-serif;direction:rtl;padding:15px;color:#1a1a2e;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+        '.gantt-container{overflow:visible!important;background:#fff!important;border:1px solid #ddd!important;width:100%!important;}' +
+        '.gantt-chart{width:100%!important;}' +
+        '.gantt-hrow{display:flex!important;flex-direction:row!important;background:#1a3a5c!important;width:100%!important;}' +
+        '.gantt-hcell{padding:6px 4px!important;font-size:8px!important;font-weight:700;color:#f0a500!important;text-align:center;border-right:1px solid rgba(255,255,255,0.3);flex-shrink:0;display:flex!important;align-items:center;justify-content:center;}' +
+        '.gantt-hcell.name{min-width:140px!important;text-align:right;padding-right:10px!important;justify-content:flex-start!important;}' +
+        '.gantt-hcell.info{min-width:60px!important;}' +
+        '.gantt-hcell.day{min-width:32px!important;width:32px!important;}' +
+        '.gantt-row{display:flex!important;flex-direction:row!important;border-bottom:1px solid #ddd;min-height:30px;align-items:stretch;width:100%!important;page-break-inside:avoid;position:relative!important;}' +
+        '.gantt-cell{padding:4px 2px!important;font-size:8px!important;display:flex!important;align-items:center;border-right:1px solid #eee;flex-shrink:0;justify-content:center;}' +
+        '.gantt-cell.name{min-width:140px!important;justify-content:flex-start!important;padding-right:10px!important;font-weight:600;font-size:9px!important;}' +
+        '.gantt-cell.info{min-width:60px!important;font-size:8px!important;}' +
+        '.gantt-cell.day{min-width:32px!important;width:32px!important;position:relative!important;}' +
+        '.gantt-cell.weekend{background:rgba(239,68,68,0.08)!important;}' +
+        '.gantt-cell.today{background:rgba(240,165,0,0.15)!important;}' +
+        '.gantt-bar{position:absolute!important;top:5px!important;height:20px!important;border-radius:3px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:7px!important;font-weight:700;color:#fff!important;z-index:5!important;min-width:20px!important;padding:0 4px!important;white-space:nowrap;overflow:hidden!important;left:2px!important;box-shadow:0 1px 3px rgba(0,0,0,0.4)!important;}' +
+        '.gantt-legend{display:flex;gap:10px;padding:6px 10px;font-size:8px;flex-wrap:wrap;background:#f9fafb;}' +
+        '.print-header{background:linear-gradient(135deg,#1a3a5c,#0f2847)!important;color:#fff!important;padding:15px!important;border-radius:8px!important;margin-bottom:15px!important;display:flex;align-items:center;gap:12px;}' +
+        '.print-header *{color:#fff!important;}' +
+        '.gold-text{color:#f0a500!important;}' +
+        '.print-footer{background:#1a3a5c!important;color:#fff!important;padding:10px!important;border-radius:8px!important;margin-top:15px!important;text-align:center!important;font-size:8px;}' +
+        '@page{margin:1cm;size:A4 landscape;}' +
+        '@media print{' +
+        '  .gantt-row{page-break-inside:avoid;}' +
+        '}' +
+        '<\/style><\/head><body>');
+    
+    var headerPrintHTML = getPrintHeaderHTML(title)
+        .replace('padding:20px', 'padding:12px')
+        .replace('font-size:18px', 'font-size:15px')
+        .replace('font-size:28px', 'font-size:24px')
+        .replace('font-size:11px', 'font-size:9px');
+    
+    _printWindow.document.write(headerPrintHTML);
+    _printWindow.document.write('<div class="gantt-container"><div class="gantt-chart">');
+    _printWindow.document.write(headerHTML);
+    _printWindow.document.write(rowsHTML);
+    _printWindow.document.write(legendHTML);
+    _printWindow.document.write('</div></div>');
+    
+    var footerHTML = getPrintFooterHTML()
+        .replace('padding:15px', 'padding:8px')
+        .replace('font-size:10px', 'font-size:8px');
+    
+    _printWindow.document.write(footerHTML);
+    _printWindow.document.write('<\/body><\/html>');
+    _printWindow.document.close();
+    
+    _printWindow.onload = function() {
+        setTimeout(function() {
+            _printWindow.print();
+        }, 1000);
+    };
+}
+
+/* ═══════════════ FIXED EXPORT WORD - DARK BLUE HEADER ═══════════════ */
+function exportWord(title, content) {
+    var fullHTML = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">' +
+        '<style>' +
+        'body{font-family:"Cairo",sans-serif;direction:rtl;padding:25px;color:#1a1a2e;background:#fff;}' +
+        'table{width:100%;border-collapse:collapse;margin:10px 0;border:1px solid #ddd;}' +
+        'th{background:#1a3a5c;color:#f0a500;padding:10px;font-size:10px;border:1px solid #ddd;}' +
+        'td{padding:8px;border:1px solid #ddd;font-size:9px;}' +
+        '.print-header{background:#1a3a5c;color:#fff;padding:20px;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;gap:15px;}' +
+        '.print-header *{color:#fff;}' +
+        '.gold-text{color:#f0a500;}' +
+        '.print-footer{background:#1a3a5c;color:#fff;padding:15px;border-radius:10px;margin-top:20px;text-align:center;font-size:10px;}' +
+        '@page{margin:1.5cm;size:A4;}' +
+        '<\/style><\/head><body>';
+    
+    // Dark blue header
+    fullHTML += '<div class="print-header">' +
+        '<div style="background:#fff;border-radius:8px;padding:8px;text-align:center;flex-shrink:0;">' +
+        '<div style="font-size:28px;color:#f0a500;">👑</div><div style="font-size:6px;color:#1a3a5c;">الاشغال</div></div>' +
+        '<div><div class="gold-text" style="font-size:11px;">وزارة الأشغال العامة والإسكان - المملكة الأردنية الهاشمية</div>' +
+        '<h2 style="font-size:18px;margin:5px 0;color:#fff;">' + title + '</h2>' +
+        '<div style="font-size:9px;opacity:0.7;">تاريخ الإصدار: ' + new Date().toLocaleDateString('ar-SA') + '</div></div></div>';
+    
+    fullHTML += content;
+    
+    // Footer
+    fullHTML += '<div class="print-footer">👑 © ' + new Date().getFullYear() + ' وزارة الأشغال العامة والإسكان - جميع الحقوق محفوظة 👑</div>';
+    fullHTML += '<\/body><\/html>';
+    
+    var b = new Blob([fullHTML], { type: 'application/msword' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = title.replace(/\s+/g, '_') + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast('📄 تم تصدير ' + title);
+}
+
+/* ═══════════════ FIXED EXPORT EXCEL - RTL WITH BORDERS & HEADER ═══════════════ */
+function exportExcel(filename, sheets) {
+    var wb = XLSX.utils.book_new();
+    sheets.forEach(function(s) {
+        var ws = XLSX.utils.aoa_to_sheet(s.data);
+        
+        // Set column widths
+        var colWidths = [];
+        if (s.data.length > 0) {
+            for (var c = 0; c < s.data[0].length; c++) {
+                var maxLen = 15;
+                for (var r = 0; r < s.data.length; r++) {
+                    if (s.data[r][c] && String(s.data[r][c]).length > maxLen) {
+                        maxLen = String(s.data[r][c]).length;
+                    }
+                }
+                colWidths.push({ wch: Math.min(maxLen + 5, 40) });
+            }
+        }
+        ws['!cols'] = colWidths;
+        
+        // Format cells with borders and RTL
+        var range = XLSX.utils.decode_range(ws['!ref']);
+        for (var R = range.s.r; R <= range.e.r; R++) {
+            for (var C = range.s.c; C <= range.e.c; C++) {
+                var cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                if (!ws[cellRef]) ws[cellRef] = { v: '', t: 's' };
+                
+                if (R === 0) {
+                    // Header row styling - dark blue background, gold text
+                    ws[cellRef].s = {
+                        border: {
+                            top: { style: 'thin', color: { rgb: '000000' } },
+                            bottom: { style: 'medium', color: { rgb: '1a3a5c' } },
+                            left: { style: 'thin', color: { rgb: '000000' } },
+                            right: { style: 'thin', color: { rgb: '000000' } }
+                        },
+                        font: { name: 'Cairo', sz: 12, bold: true, color: { rgb: 'f0a500' } },
+                        fill: { fgColor: { rgb: '1a3a5c' }, patternType: 'solid' },
+                        alignment: { horizontal: 'center', vertical: 'center', readingOrder: 2 }
+                    };
+                } else {
+                    // Data rows - borders and RTL alignment
+                    ws[cellRef].s = {
+                        border: {
+                            top: { style: 'thin', color: { rgb: '000000' } },
+                            bottom: { style: 'thin', color: { rgb: '000000' } },
+                            left: { style: 'thin', color: { rgb: '000000' } },
+                            right: { style: 'thin', color: { rgb: '000000' } }
+                        },
+                        font: { name: 'Cairo', sz: 10 },
+                        alignment: { horizontal: 'right', vertical: 'center', readingOrder: 2 }
+                    };
+                }
+            }
+        }
+        
+        XLSX.utils.book_append_sheet(wb, ws, s.name);
+    });
+    XLSX.writeFile(wb, filename + '.xlsx');
+    toast('📊 تم تصدير ' + filename);
+}
+
+/* ═══════════════ PROJECTS CRUD ═══════════════ */
+function saveProject() {
+    var n = g('f_pname').value.trim();
+    if (!n) { toast('⚠️ يرجى إدخال اسم المشروع'); return; }
+
+    var pid = parseInt(g('f_pid').value) || 0;
+    var data = {
+        id: pid || Date.now(),
+        name: n,
+        contractNo: g('f_pcontract').value.trim(),
+        province: g('f_pprovince').value,
+        location: g('f_ploc').value.trim(),
+        contractor: g('f_pcontractor').value.trim(),
+        consultant: g('f_pconsultant').value.trim(),
+        supervisor: g('f_psup').value.trim(),
+        length: g('f_plen').value,
+        start: g('f_pstart').value,
+        end: g('f_pend').value,
+        budget: g('f_pbudget').value,
+        progress: parseInt(g('f_pprog').value) || 0,
+        plannedProgress: parseInt(g('f_pprog').value) || 0,
+        status: g('f_pstat').value,
+        lastUpdate: today()
+    };
+
+    if (pid) {
+        var ex = D.projects.find(function(x) { return x.id == pid; });
+        if (ex) Object.assign(ex, data);
+        toast('✅ تم تحديث المشروع');
+    } else {
+        D.projects.push(data);
+        toast('✅ تم إضافة المشروع');
+    }
+
+    closeModal('modal_project');
+    clearProjectForm();
+    syncAllData();
+    saveData();
+    refreshPage();
+    updateDashboard();
+    renderSummary();
+}
+
+function clearProjectForm() {
+    ['f_pid', 'f_pname', 'f_pcontract', 'f_ploc', 'f_pcontractor', 'f_pconsultant', 'f_psup', 'f_plen', 'f_pbudget'].forEach(function(id) { g(id).value = ''; });
+    g('f_pprog').value = '0';
+    g('f_pstat').value = 'نشط';
+}
+
+function editProject(id) {
+    var p = D.projects.find(function(x) { return x.id == id; });
+    if (!p) return;
+    g('f_pid').value = p.id;
+    g('f_pname').value = p.name;
+    g('f_pcontract').value = p.contractNo || '';
+    g('f_pprovince').value = p.province || '';
+    g('f_ploc').value = p.location || '';
+    g('f_pcontractor').value = p.contractor || '';
+    g('f_pconsultant').value = p.consultant || '';
+    g('f_psup').value = p.supervisor || '';
+    g('f_plen').value = p.length || '';
+    g('f_pstart').value = p.start || '';
+    g('f_pend').value = p.end || '';
+    g('f_pbudget').value = p.budget || '';
+    g('f_pprog').value = p.progress;
+    g('f_pstat').value = p.status;
+    openModal('modal_project');
+}
+
+function renderProjects() {
+    if (!D.projects.length) {
+        return '<div class="toolbar"><span class="toolbar-title">المشاريع</span><button class="btn btn-primary btn-sm" onclick="clearProjectForm();openModal(\'modal_project\')">+ إضافة مشروع</button></div>' +
+            '<div class="empty-message">لا توجد مشاريع - اضغط على زر الإضافة لإنشاء مشروع جديد</div>';
+    }
+    var h = '<div class="toolbar"><span class="toolbar-title">🏗️ المشاريع (' + D.projects.length + ')</span>' +
+        '<button class="btn btn-primary btn-sm" onclick="clearProjectForm();openModal(\'modal_project\')">+ إضافة مشروع</button>' +
+        '<button class="btn btn-print btn-sm" onclick="printElement(\'projectsTable\',\'تقرير المشاريع\')">🖨️ طباعة</button>' +
+        '<button class="btn btn-word btn-sm" onclick="exportProjectsWord()">📄 Word</button>' +
+        '<button class="btn btn-excel btn-sm" onclick="exportProjectsExcel()">📊 Excel</button></div>';
+
+    h += '<div id="projectsTable"><div class="table-wrap"><table><thead><tr>' +
+        '<th>#</th><th>المشروع</th><th>المحافظة</th><th>المقاول</th><th>نسبة الإنجاز</th><th>الحالة</th><th>المشرف</th><th>إجراءات</th>' +
+        '</tr></thead><tbody>';
+
+    D.projects.forEach(function(p, i) {
+        var pc = p.progress >= 70 ? 'prog-green' : p.progress >= 40 ? 'prog-yellow' : 'prog-red';
+        var sc = { 'نشط': 'badge-green', 'منجز': 'badge-blue', 'متوقف': 'badge-red', 'مخطط': 'badge-yellow' } [p.status] || 'badge-yellow';
+        h += '<tr><td>' + (i + 1) + '</td>' +
+            '<td><strong>' + esc(p.name) + '</strong><br><small style="color:#7fa8c9;">عقد: ' + esc(p.contractNo || '—') + '</small></td>' +
+            '<td>' + esc(p.province || '—') + '</td>' +
+            '<td>' + esc(p.contractor || '—') + '</td>' +
+            '<td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="flex:1;"><div class="progress-fill ' + pc + '" style="width:' + p.progress + '%;"></div></div><strong>' + p.progress + '%</strong></div></td>' +
+            '<td><span class="badge ' + sc + '">' + p.status + '</span></td>' +
+            '<td>' + esc(p.supervisor || '—') + '</td>' +
+            '<td><button class="btn btn-xs btn-warning" onclick="editProject(' + p.id + ')">✏️ تعديل</button></td></tr>';
+    });
+
+    h += '</tbody></table></div></div>';
+    return h;
+}
+
+function exportProjectsWord() {
+    var h = '<table><thead><tr><th>#</th><th>المشروع</th><th>المحافظة</th><th>المقاول</th><th>الإنجاز</th><th>الحالة</th></tr></thead><tbody>';
+    D.projects.forEach(function(p, i) {
+        h += '<tr><td>' + (i + 1) + '</td><td>' + esc(p.name) + '</td><td>' + esc(p.province || '') + '</td><td>' + esc(p.contractor || '') + '</td><td>' + p.progress + '%</td><td>' + p.status + '</td></tr>';
+    });
+    h += '</tbody></table>';
+    exportWord('تقرير المشاريع', h);
+}
+
+function exportProjectsExcel() {
+    var d = [
+        ['#', 'المشروع', 'المحافظة', 'المقاول', 'الإنجاز', 'الحالة', 'المشرف']
+    ];
+    D.projects.forEach(function(p, i) {
+        d.push([i + 1, p.name, p.province || '', p.contractor || '', p.progress + '%', p.status, p.supervisor || '']);
+    });
+    exportExcel('المشاريع', [{ name: 'المشاريع', data: d }]);
+}
+
+/* ═══════════════ GANTT & TIMELINE ═══════════════ */
+function addTimeline() {
+    var pid = g('f_tproj').value,
+        n = g('f_tname').value.trim();
+    if (!pid || !n) { toast('⚠️ أكمل الحقول المطلوبة'); return; }
+    var dur = parseInt(g('f_tdur').value) || 1,
+        sd = g('f_tstart').value || today();
+    var start = parseDate(sd),
+        end = new Date(start);
+    end.setDate(end.getDate() + dur - 1);
+
+    D.timelineTasks.push({
+        id: Date.now(),
+        projectId: pid,
+        projectName: (D.projects.find(function(p) { return p.id == pid; }) || {}).name || '',
+        order: D.timelineTasks.filter(function(t) { return t.projectId == pid; }).length + 1,
+        name: n,
+        duration: dur,
+        startDate: sd,
+        endDate: formatDate(end),
+        type: g('f_ttype').value,
+        status: g('f_tstat').value,
+        progress: parseInt(g('f_tprog').value) || 0,
+        color: g('f_tcolor').value
+    });
+
+    closeModal('modal_timeline');
+    ['f_tname', 'f_ttype'].forEach(function(id) { g(id).value = ''; });
+    g('f_tdur').value = '1';
+    g('f_tprog').value = '0';
+    syncAllData();
+    saveData();
+    refreshPage();
+    if (pid) currentGanttPid = parseInt(pid);
+    toast('✅ تم إضافة المهمة');
+}
+
+function updateTimelineField(id, field, value) {
+    var t = D.timelineTasks.find(function(x) { return x.id === id; });
+    if (!t) return;
+    if (field === 'duration') { value = Math.max(1, parseInt(value) || 1); }
+    if (field === 'progress') {
+        value = Math.min(100, Math.max(0, parseInt(value) || 0));
+        if (value >= 100) t.status = 'مكتملة';
+        else if (value > 0 && t.status == 'مكتملة') t.status = 'قيد التنفيذ';
+    }
+    t[field] = value;
+    if (field === 'startDate' || field === 'duration') {
+        var sd = parseDate(t.startDate);
+        sd.setDate(sd.getDate() + t.duration - 1);
+        t.endDate = formatDate(sd);
+    }
+    syncAllData();
+    silentSave();
+}
+
+function deleteTimeline(id) {
+    if (!confirm('هل أنت متأكد من حذف هذه المهمة؟')) return;
+    D.timelineTasks = D.timelineTasks.filter(function(x) { return x.id !== id; });
+    syncAllData();
+    saveData();
+    refreshPage();
+    toast('🗑️ تم حذف المهمة');
+}
+
+function renderGantt() {
+    if (!D.projects.length) return '<div class="empty-message">لا توجد مشاريع - أضف مشروعاً أولاً</div>';
+    if (!currentGanttPid) currentGanttPid = D.projects[0].id;
+    var pid = currentGanttPid;
+    var p = D.projects.find(function(x) { return x.id == pid; });
+    if (!p) return '<div class="empty-message">المشروع غير موجود</div>';
+
+    var tasks = D.timelineTasks.filter(function(t) { return t.projectId == pid; }).sort(function(a, b) { return a.order - b.order; });
+    var boq = D.boqItems.filter(function(b) { return b.projectId == pid; });
+    var daily = D.dailyLogs.filter(function(d) { return d.projectId == pid; });
+
+    var totalTasks = tasks.length,
+        comp = tasks.filter(function(t) { return t.status === 'مكتملة'; }).length;
+    var prog2 = tasks.filter(function(t) { return t.status === 'قيد التنفيذ'; }).length;
+    var del = tasks.filter(function(t) { return t.status === 'متأخرة'; }).length;
+    var taskProg = totalTasks > 0 ? Math.round((comp / totalTasks) * 100) : 0;
+
+    var totalBOQ = boq.length,
+        compBOQ = boq.filter(function(b) { return b.status === 'مكتمل'; }).length;
+    var boqProg = totalBOQ > 0 ? Math.round((compBOQ / totalBOQ) * 100) : 0;
+
+    var planned = p.plannedProgress || 0,
+        diff = p.progress - planned;
+    var tc = diff >= 0 ? 'up' : diff > -5 ? 'stable' : 'down';
+    var ta2 = diff >= 0 ? '🔼' : diff > -5 ? '▶️' : '🔽';
+    var tt = diff >= 0 ? 'متقدم على المخطط' : diff > -5 ? 'حسب المخطط' : 'متأخر عن المخطط';
+
+    var h = '<div class="toolbar"><span class="toolbar-title">📅 الجدول الزمني</span>' +
+        '<select onchange="currentGanttPid=parseInt(this.value);refreshPage();" style="min-width:220px;padding:8px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;font-family:Cairo;font-size:11px;">' +
+        D.projects.map(function(pr) { return '<option value="' + pr.id + '"' + (pr.id == pid ? ' selected' : '') + '>' + esc(pr.name) + '</option>'; }).join('') +
+        '</select>' +
+        '<button class="btn btn-primary btn-sm" onclick="updateSelects(\'f_tproj\');openModal(\'modal_timeline\')">+ إضافة مهمة</button>' +
+        '<button class="btn btn-project btn-sm" onclick="exportToMSProject(' + pid + ')">📅 تصدير MS Project</button></div>';
+
+    // KPI Section with Speedometer
+    h += '<div id="ganttKPISection"><h4 style="color:#f0a500;margin:16px 0 10px;">📊 مؤشرات الأداء للمشروع</h4><div class="kpi-dashboard">';
+    h += '<div class="kpi-card"><div class="kpi-title">🚗 عداد الإنجاز</div>' + buildSpeedometer(p.progress, 140) + '</div>';
+    h += '<div class="kpi-card"><div class="kpi-title">📅 المهام الزمنية</div>' + buildCounter(totalTasks, 2) +
+        '<div style="font-size:9px;color:#7fa8c9;">✅ ' + comp + ' مكتملة | 🔄 ' + prog2 + ' جارية | ⚠️ ' + del + ' متأخرة</div>' +
+        '<div style="font-size:22px;font-weight:900;color:' + (taskProg >= 70 ? '#22c55e' : taskProg >= 40 ? '#3b82f6' : '#f97316') + ';">' + taskProg + '%</div></div>';
+    h += '<div class="kpi-card"><div class="kpi-title">📋 بنود المشروع</div>' + buildCounter(totalBOQ, 2) +
+        '<div style="font-size:9px;color:#7fa8c9;">✅ ' + compBOQ + ' من ' + totalBOQ + ' مكتملة</div>' +
+        '<div style="font-size:22px;font-weight:900;color:' + (boqProg >= 70 ? '#22c55e' : boqProg >= 40 ? '#3b82f6' : '#f97316') + ';">' + boqProg + '%</div></div>';
+    h += '<div class="kpi-card"><div class="kpi-title">📈 الأداء مقابل المخطط</div>' +
+        '<div style="font-size:10px;color:#7fa8c9;margin:4px 0;">مخطط: <b style="color:#f0a500;">' + planned + '%</b> | فعلي: <b style="color:#fff;">' + p.progress + '%</b></div>' +
+        '<div class="trend-box ' + tc + '">' + ta2 + ' ' + tt + ' (' + Math.abs(diff) + '%)</div></div>';
+    h += '<div class="kpi-card"><div class="kpi-title">📋 المتابعات اليومية</div>' + buildCounter(daily.length, 3) +
+        '<div style="font-size:9px;color:#7fa8c9;">إجمالي التقارير اليومية</div></div>';
+    h += '</div></div>';
+    h += '<button class="btn btn-print btn-sm" onclick="printElement(\'ganttKPISection\',\'مؤشرات الأداء - ' + esc(p.name) + '\')" style="margin-bottom:10px;">🖨️ طباعة المؤشرات</button>';
+
+    // BOQ Bar Chart WITH BOQ NAMES
+    if (boq.length > 0) {
+        h += '<div id="ganttChartSection"><h4 style="color:#f0a500;margin:12px 0 8px;">📊 مخطط أعمدة - نسبة إنجاز البنود (من 100%)</h4><div class="chart-box"><canvas id="boqBarChart"></canvas></div></div>';
+        h += '<button class="btn btn-print btn-sm" onclick="printElement(\'ganttChartSection\',\'مخطط البنود - ' + esc(p.name) + '\')" style="margin-bottom:10px;">🖨️ طباعة المخطط مع البنود</button>';
+    }
+
+    // Tasks table with Gantt bar chart
+    h += '<div id="ganttTasksSection"><h4 style="color:#f0a500;margin:12px 0 8px;">📋 المهام الزمنية</h4>';
+    if (tasks.length) {
+        h += '<div class="table-wrap"><table><thead><tr><th>#</th><th>المهمة</th><th>النوع</th><th>المدة</th><th>البدء</th><th>الانتهاء</th><th>الحالة</th><th>الإنجاز</th><th>حذف</th></tr></thead><tbody>';
+        tasks.forEach(function(t, i) {
+            var sc = { 'مكتملة': 'badge-green', 'قيد التنفيذ': 'badge-blue', 'لم تبدأ': 'badge-yellow', 'متأخرة': 'badge-red' } [t.status] || 'badge-yellow';
+            h += '<tr><td>' + (i + 1) + '</td>' +
+                '<td><span class="editable" contenteditable="true" onblur="updateTimelineField(' + t.id + ',\'name\',this.textContent)">' + esc(t.name) + '</span></td>' +
+                '<td><span class="editable" contenteditable="true" onblur="updateTimelineField(' + t.id + ',\'type\',this.textContent)">' + esc(t.type) + '</span></td>' +
+                '<td><span class="editable" contenteditable="true" onblur="updateTimelineField(' + t.id + ',\'duration\',this.textContent);refreshPage();">' + t.duration + ' يوم</span></td>' +
+                '<td><input type="date" value="' + t.startDate + '" onchange="updateTimelineField(' + t.id + ',\'startDate\',this.value);refreshPage();" style="width:115px;background:transparent;border:1px dashed transparent;color:inherit;font-family:Cairo;font-size:10px;padding:2px;" onfocus="this.style.borderColor=\'#f0a500\'"></td>' +
+                '<td>' + t.endDate + '</td>' +
+                '<td><span class="badge ' + sc + '">' + t.status + '</span></td>' +
+                '<td><div style="display:flex;align-items:center;gap:4px;"><div class="progress-bar" style="flex:1;width:60px;"><div class="progress-fill prog-green" style="width:' + t.progress + '%"></div></div><span class="editable" contenteditable="true" onblur="updateTimelineField(' + t.id + ',\'progress\',this.textContent);refreshPage();">' + t.progress + '%</span></div></td>' +
+                '<td><button class="btn btn-xs btn-danger" onclick="deleteTimeline(' + t.id + ')">🗑️</button></td></tr>';
+        });
+        h += '</tbody></table></div>';
+    } else { h += '<div class="empty-message">لا توجد مهام - أضف مهاماً للمشروع</div>'; }
+    h += '</div>';
+
+
+
+    // Gantt bar chart with task names on bars
+    if (tasks.length > 0) {
+        var ads = [];
+        tasks.forEach(function(t) { ads.push(parseDate(t.startDate));
+            ads.push(parseDate(t.endDate)); });
+        var minD = new Date(Math.min.apply(null, ads)),
+            maxD = new Date(Math.max.apply(null, ads));
+        minD.setDate(minD.getDate() - 2);
+        maxD.setDate(maxD.getDate() + 2);
+        var ts = today();
+
+        h += '<div id="ganttBarSection"><h4 style="color:#f0a500;margin:12px 0 8px;">📊 مخطط جانت الزمني مع أسماء المهام</h4><div class="gantt-container"><div class="gantt-chart"><div class="gantt-hrow"><div class="gantt-hcell name">المهمة</div><div class="gantt-hcell info">مدة</div><div class="gantt-hcell info">بدء</div><div class="gantt-hcell info">نهاية</div>';
+        var cd2 = new Date(minD);
+        while (cd2 <= maxD) {
+            var we2 = cd2.getDay() === 5 || cd2.getDay() === 6,
+                it2 = formatDate(cd2) === ts;
+            h += '<div class="gantt-hcell day' + (we2 ? ' weekend' : '') + (it2 ? ' today' : '') + '">' + cd2.getDate() + '/' + (cd2.getMonth() + 1) + '</div>';
+            cd2.setDate(cd2.getDate() + 1);
+        }
+        h += '</div>';
+        tasks.forEach(function(t) {
+            h += '<div class="gantt-row"><div class="gantt-cell name">' + esc(t.name) + '</div><div class="gantt-cell info">' + t.duration + '</div><div class="gantt-cell info">' + t.startDate + '</div><div class="gantt-cell info">' + t.endDate + '</div>';
+          var bs = daysBetween(minD, parseDate(t.startDate)) + 6;
+var bl = Math.max(1, daysBetween(parseDate(t.startDate), parseDate(t.endDate)));
+var totalDays = daysBetween(minD, maxD) + 1;
+var barPlaced = false;
+
+for (var dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+    var currentDate = new Date(minD);
+    currentDate.setDate(currentDate.getDate() + dayIndex);
+    var we3 = currentDate.getDay() === 5 || currentDate.getDay() === 6;
+    var it3 = formatDate(currentDate) === ts;
+    
+    if (dayIndex >= bs && dayIndex <= bs + bl && !barPlaced) {
+        h += '<div class="gantt-cell day' + (we3 ? ' weekend' : '') + (it3 ? ' today' : '') + '" style="position:relative;">';
+        var barWidth = (bl + 1) * 34;
+        var showText = barWidth > 50 ? esc(t.name) : '';
+        h += '<div class="gantt-bar" style="background:' + t.color + ';left:0;width:' + (barWidth - 2) + 'px;top:5px;height:24px;" title="' + esc(t.name) + ' - ' + t.progress + '%">' + showText + '</div>';
+        barPlaced = true;
+        h += '</div>';
+    } else {
+        h += '<div class="gantt-cell day' + (we3 ? ' weekend' : '') + (it3 ? ' today' : '') + '">';
+        if (dayIndex >= bs && dayIndex <= bs + bl) {
+            // خلايا الشريط لكن بدون إضافة شريط جديد
+        }
+        h += '</div>';
+    }
+}
+            h += '</div>';
+        });
+        h += '<div class="gantt-legend" style="display:flex;gap:12px;padding:8px 12px;font-size:9px;flex-wrap:wrap;">' +
+            '<span><span style="display:inline-block;width:12px;height:8px;background:#22c55e;border-radius:2px;"></span> مكتمل</span>' +
+            '<span><span style="display:inline-block;width:12px;height:8px;background:#3b82f6;border-radius:2px;"></span> قيد التنفيذ</span>' +
+            '<span><span style="display:inline-block;width:12px;height:8px;background:#f97316;border-radius:2px;"></span> أساس</span>' +
+            '<span><span style="display:inline-block;width:12px;height:8px;background:#ef4444;border-radius:2px;"></span> متأخر</span>' +
+            '<span style="color:#7fa8c9;">⏹️ نهاية أسبوع</span><span style="color:#f0a500;">▌ اليوم</span></div>';
+        h += '</div></div></div>';
+h += '<button class="btn btn-print btn-sm" onclick="printGanttChart(\'ganttBarSection\',\'مخطط جانت - ' + esc(p.name) + '\')" style="margin-bottom:10px;">🖨️ طباعة مخطط جانت مع أسماء المهام</button>';    }
+
+    // Export buttons
+    h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">' +
+        '<button class="btn btn-word btn-sm" onclick="exportGanttWord()">📄 تصدير Word</button>' +
+        '<button class="btn btn-excel btn-sm" onclick="exportGanttExcel()">📊 تصدير Excel</button>' +
+        '<button class="btn btn-project btn-sm" onclick="exportToMSProject(' + pid + ')">📅 تصدير MS Project</button></div>';
+
+    // Initialize BOQ Bar Chart
+    setTimeout(function() {
+        var ctx = document.getElementById('boqBarChart');
+        if (ctx && boq.length > 0) {
+            var boqLabels = boq.map(function(b) {
+                return (b.description || b.code || 'بند').substring(0, 25);
+            });
+            var boqPercentages = boq.map(function(b) {
+                if (b.plannedQty && b.plannedQty > 0) {
+                    return Math.round((b.executedQty / b.plannedQty) * 100);
+                }
+                return 0;
+            });
+
+            if (ctx._chartInstance) {
+                ctx._chartInstance.destroy();
+            }
+
+            ctx._chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: boqLabels,
+                    datasets: [{
+                        label: 'نسبة الإنجاز %',
+                        data: boqPercentages,
+                        backgroundColor: boqPercentages.map(function(pct) {
+                            return pct >= 100 ? 'rgba(34,197,94,0.7)' :
+                                pct >= 70 ? 'rgba(59,130,246,0.7)' :
+                                pct >= 40 ? 'rgba(245,158,11,0.7)' :
+                                'rgba(239,68,68,0.7)';
+                        }),
+                        borderColor: boqPercentages.map(function(pct) {
+                            return pct >= 100 ? '#22c55e' :
+                                pct >= 70 ? '#3b82f6' :
+                                pct >= 40 ? '#f59e0b' :
+                                '#ef4444';
+                        }),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'x',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#7fa8c9',
+                                font: { size: 11, family: 'Cairo' },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyleWidth: 10
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'نسبة إنجاز البنود (%) - ' + esc(p.name),
+                            color: '#f0a500',
+                            font: { size: 14, family: 'Cairo', weight: 'bold' },
+                            padding: { bottom: 15 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'نسبة الإنجاز: ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'نسبة الإنجاز %',
+                                color: '#7fa8c9',
+                                font: { size: 11, family: 'Cairo' }
+                            },
+                            ticks: {
+                                color: '#7fa8c9',
+                                callback: function(value) { return value + '%'; },
+                                stepSize: 20
+                            },
+                            grid: {
+                                color: 'rgba(42,74,106,0.3)',
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'البنود',
+                                color: '#7fa8c9',
+                                font: { size: 11, family: 'Cairo' }
+                            },
+                            ticks: {
+                                color: '#e8f0f8',
+                                font: { size: 10, family: 'Cairo' },
+                                maxRotation: 45,
+                                minRotation: 0
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }, 400);
+
+    return h;
+}
+
+function exportGanttWord() {
+    var pid = currentGanttPid || (D.projects.length > 0 ? D.projects[0].id : null);
+    var tasks = pid ? D.timelineTasks.filter(function(t) { return t.projectId == pid; }) : D.timelineTasks;
+    var h = '<table><thead><tr><th>#</th><th>المهمة</th><th>النوع</th><th>المدة</th><th>البدء</th><th>الانتهاء</th><th>الحالة</th><th>الإنجاز</th></tr></thead><tbody>';
+    tasks.forEach(function(t, i) {
+        h += '<tr><td>' + (i + 1) + '</td><td>' + esc(t.name) + '</td><td>' + esc(t.type) + '</td><td>' + t.duration + ' يوم</td><td>' + t.startDate + '</td><td>' + t.endDate + '</td><td>' + t.status + '</td><td>' + t.progress + '%</td></tr>';
+    });
+    h += '</tbody></table>';
+    exportWord('الجدول الزمني', h);
+}
+
+function exportGanttExcel() {
+    var pid = currentGanttPid || (D.projects.length > 0 ? D.projects[0].id : null);
+    var tasks = pid ? D.timelineTasks.filter(function(t) { return t.projectId == pid; }) : D.timelineTasks;
+    var d = [
+        ['#', 'المهمة', 'النوع', 'المدة', 'البدء', 'الانتهاء', 'الحالة', 'الإنجاز']
+    ];
+    tasks.forEach(function(t, i) { d.push([i + 1, t.name, t.type, t.duration, t.startDate, t.endDate, t.status, t.progress + '%']); });
+    exportExcel('الجدول_الزمني', [{ name: 'مهام', data: d }]);
+}
+
+/* ═══════════════ DAILY REPORTS ═══════════════ */
+function renderDailyReports() {
+    var h = '<div class="daily-filter-bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:12px;background:#162d45;border:1px solid #2a4a6a;border-radius:10px;">' +
+        '<label style="font-size:11px;font-weight:600;">🎯 المشروع:</label>' +
+        '<select id="dailyFilterProject" onchange="filterDailyReports()" style="min-width:200px;padding:8px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;font-family:Cairo;font-size:11px;">' +
+        '<option value="all">📋 جميع المشاريع</option>' + D.projects.map(function(p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('') + '</select>' +
+        '<label style="font-size:11px;font-weight:600;margin-right:16px;">📅 التاريخ:</label>' +
+        '<input type="date" id="dailyFilterDate" value="' + today() + '" onchange="filterDailyReports()" style="padding:8px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;font-family:Cairo;font-size:11px;">' +
+        '<button class="btn btn-primary btn-sm" onclick="createTodayReport()">📝 تقرير اليوم</button></div>' +
+        '<div id="dailyReportsList"></div>';
+    h += buildDailyReportsList();
+    return h;
+}
+
+function buildDailyReportsList() {
+    var pid = (g('dailyFilterProject') || {}).value || 'all';
+    var date = (g('dailyFilterDate') || {}).value || '';
+    var filtered = D.dailyLogs;
+    if (pid !== 'all') filtered = filtered.filter(function(d) { return d.projectId == pid; });
+    if (date) filtered = filtered.filter(function(d) { return d.date == date; });
+    filtered.sort(function(a, b) { return b.id - a.id; });
+
+    if (!filtered.length) return '<div id="dailyReportsList"><div class="empty-message">لا توجد تقارير للفترة المحددة</div></div>';
+
+    var h = '<div id="dailyReportsList">';
+    filtered.forEach(function(d) {
+        var cls = d.date === today() ? ' selected' : '';
+        h += '<div class="daily-card' + cls + '" id="dailyCard' + d.id + '">';
+        if (d.date === today()) h += '<div class="card-status today" style="position:absolute;top:12px;left:12px;padding:3px 10px;border-radius:12px;font-size:8px;font-weight:700;background:#22c55e;color:#fff;">اليوم</div>';
+        h += '<div class="card-header"><div><div class="card-date">📅 ' + d.date + ' | 🌤️ ' + (d.weather || 'صحو') + (d.progress ? ' | 📊 إنجاز: ' + d.progress + '%' : '') + '</div>' +
+            '<div class="card-project">🏗️ ' + esc(d.projectName || '—') + '</div></div></div>' +
+            '<div class="card-details">' +
+            '<div class="card-detail-item"><label>📍 موقع العمل</label><span>' + esc(d.location || '—') + '</span></div>' +
+            '<div class="card-detail-item"><label>🔧 نوع العمل</label><span>' + esc(d.workType || '—') + '</span></div>' +
+            '<div class="card-detail-item"><label>📦 الكمية</label><span>' + esc(d.qty || '—') + '</span></div>' +
+            '<div class="card-detail-item"><label>🚜 المعدات</label><span>' + esc(d.equip || '—') + '</span></div>' +
+            '<div class="card-detail-item"><label>👷 العمالة</label><span>' + (d.workers || '—') + '</span></div>' +
+            '<div class="card-detail-item"><label>📝 ملاحظات</label><span>' + esc(d.notes || '—') + '</span></div>' +
+            '</div>' +
+            '<div class="card-actions">' +
+            '<button class="btn btn-xs btn-warning" onclick="editDailyReport(' + d.id + ')">✏️ تعديل</button>' +
+            '<button class="btn btn-xs btn-print" onclick="printDailyReport(' + d.id + ')">🖨️ طباعة</button>' +
+            '<button class="btn btn-xs btn-word" onclick="exportDailyReportWord(' + d.id + ')">📄 Word</button>' +
+            '<button class="btn btn-xs btn-excel" onclick="exportDailyReportExcel(' + d.id + ')">📊 Excel</button>' +
+            '<button class="btn btn-xs btn-danger" onclick="deleteDailyItem(' + d.id + ')">🗑️ حذف</button>' +
+            '</div></div>';
+    });
+    h += '</div>';
+    return h;
+}
+
+function filterDailyReports() {
+    g('dailyReportsList').innerHTML = buildDailyReportsList();
+}
+
+function createTodayReport() {
+    g('f_dr_id').value = '';
+    g('f_dr_date').value = today();
+    ['f_dr_loc', 'f_dr_work', 'f_dr_qty', 'f_dr_equip', 'f_dr_workers', 'f_dr_progress', 'f_dr_notes'].forEach(function(id) { g(id).value = ''; });
+    g('f_dr_weather').value = 'صحو';
+    updateSelects('f_dr_proj');
+    g('modal_daily_report').querySelector('.modal-title').textContent = '📝 تقرير يومي جديد';
+    openModal('modal_daily_report');
+}
+
+function editDailyReport(id) {
+    var d = D.dailyLogs.find(function(x) { return x.id === id; });
+    if (!d) return;
+    g('f_dr_id').value = d.id;
+    g('f_dr_date').value = d.date || '';
+    g('f_dr_loc').value = d.location || '';
+    g('f_dr_work').value = d.workType || '';
+    g('f_dr_qty').value = d.qty || '';
+    g('f_dr_equip').value = d.equip || '';
+    g('f_dr_workers').value = d.workers || '';
+    g('f_dr_weather').value = d.weather || 'صحو';
+    g('f_dr_progress').value = d.progress || '';
+    g('f_dr_notes').value = d.notes || '';
+    updateSelects('f_dr_proj');
+    if (d.projectId) g('f_dr_proj').value = d.projectId;
+    g('modal_daily_report').querySelector('.modal-title').textContent = '✏️ تعديل التقرير';
+    openModal('modal_daily_report');
+}
+
+function saveDailyReport() {
+    var pid = g('f_dr_proj').value;
+    if (!pid) { toast('⚠️ اختر مشروعاً'); return; }
+    var proj = D.projects.find(function(p) { return p.id == pid; });
+    var id = parseInt(g('f_dr_id').value);
+
+    var data = {
+        projectId: pid,
+        projectName: proj ? proj.name : '',
+        date: g('f_dr_date').value,
+        location: g('f_dr_loc').value.trim(),
+        workType: g('f_dr_work').value.trim(),
+        qty: g('f_dr_qty').value.trim(),
+        equip: g('f_dr_equip').value.trim(),
+        workers: g('f_dr_workers').value.trim(),
+        weather: g('f_dr_weather').value,
+        progress: g('f_dr_progress').value,
+        notes: g('f_dr_notes').value.trim()
+    };
+
+    if (id) {
+        var ex = D.dailyLogs.find(function(x) { return x.id === id; });
+        if (ex) Object.assign(ex, data);
+    } else {
+        data.id = Date.now();
+        D.dailyLogs.push(data);
+    }
+
+    if (data.progress && proj) {
+        proj.progress = parseInt(data.progress);
+    }
+
+    closeModal('modal_daily_report');
+    syncAllData();
+    saveData();
+    filterDailyReports();
+    updateDashboard();
+    toast('✅ تم حفظ التقرير اليومي');
+}
+
+function deleteDailyItem(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا التقرير؟')) return;
+    D.dailyLogs = D.dailyLogs.filter(function(x) { return x.id !== id; });
+    syncAllData();
+    saveData();
+    filterDailyReports();
+    toast('🗑️ تم حذف التقرير');
+}
+
+function printDailyReport(id) {
+    var d = D.dailyLogs.find(function(x) { return x.id === id; });
+    if (!d) return;
+    var content = '<div style="background:#fff;padding:20px;border-radius:10px;border:1px solid #e5e7eb;">' +
+        '<h3 style="color:#1a3a5c;border-right:4px solid #f0a500;padding-right:10px;margin-bottom:15px;">📋 تقرير يومي</h3>' +
+        '<table><tr><td style="width:25%;background:#f0f4f8;font-weight:700;padding:10px;">📅 التاريخ</td><td style="padding:10px;">' + d.date + '</td>' +
+        '<td style="width:25%;background:#f0f4f8;font-weight:700;padding:10px;">🌤️ الطقس</td><td style="padding:10px;">' + (d.weather || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">🏗️ المشروع</td><td style="padding:10px;">' + esc(d.projectName || '—') + '</td>' +
+        '<td style="background:#f0f4f8;font-weight:700;padding:10px;">📍 الموقع</td><td style="padding:10px;">' + esc(d.location || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">🔧 العمل</td><td colspan="3" style="padding:10px;">' + esc(d.workType || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">📦 الكمية</td><td style="padding:10px;">' + esc(d.qty || '—') + '</td>' +
+        '<td style="background:#f0f4f8;font-weight:700;padding:10px;">🚜 المعدات</td><td style="padding:10px;">' + esc(d.equip || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">👷 العمالة</td><td style="padding:10px;">' + (d.workers || '—') + '</td>' +
+        '<td style="background:#f0f4f8;font-weight:700;padding:10px;">📊 الإنجاز</td><td style="padding:10px;">' + (d.progress ? d.progress + '%' : '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">📝 ملاحظات</td><td colspan="3" style="padding:10px;">' + esc(d.notes || '—') + '</td></tr>' +
+        '</table></div>';
+    
+    printContent('تقرير يومي - ' + esc(d.projectName), content);
+}
+
+function printContent(title, content) {
+    if (_printWindow && !_printWindow.closed) {
+        _printWindow.close();
+    }
+    
+    _printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!_printWindow) { 
+        toast('⚠️ يرجى السماح بالنوافذ المنبثقة'); 
+        return; 
+    }
+    
+    _printWindow.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>' + title + '</title>' +
+        '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">' +
+        '<style>' +
+        'body{font-family:"Cairo",sans-serif;direction:rtl;padding:25px;color:#1a1a2e;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+        'table{width:100%;border-collapse:collapse;border:1px solid #ddd;}th{background:#1a3a5c!important;color:#f0a500!important;padding:10px;border:1px solid #ddd;}' +
+        'td{padding:8px;border:1px solid #ddd;}' +
+        '.print-header{background:#1a3a5c!important;color:#fff!important;padding:20px;border-radius:10px;margin-bottom:20px;}' +
+        '.print-footer{background:#1a3a5c!important;color:#fff!important;padding:12px;border-radius:8px;margin-top:20px;text-align:center;font-size:10px;}' +
+        '@page{margin:1.5cm;size:A4;}' +
+        '<\/style><\/head><body>');
+    
+    _printWindow.document.write(getPrintHeaderHTML(title));
+    _printWindow.document.write('<div>' + content + '</div>');
+    _printWindow.document.write(getPrintFooterHTML());
+    _printWindow.document.write('<\/body><\/html>');
+    _printWindow.document.close();
+    
+    _printWindow.onload = function() {
+        setTimeout(function() {
+            _printWindow.print();
+        }, 500);
+    };
+}
+
+function exportDailyReportWord(id) {
+    var d = D.dailyLogs.find(function(x) { return x.id === id; });
+    if (!d) return;
+    var content = '<table><tr><td style="background:#f0f4f8;font-weight:700;">التاريخ</td><td>' + d.date + '</td><td style="background:#f0f4f8;font-weight:700;">الطقس</td><td>' + (d.weather || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;">المشروع</td><td colspan="3">' + esc(d.projectName || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;">العمل المنفذ</td><td colspan="3">' + esc(d.workType || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;">الكمية</td><td>' + esc(d.qty || '—') + '</td><td style="background:#f0f4f8;font-weight:700;">المعدات</td><td>' + esc(d.equip || '—') + '</td></tr></table>';
+    exportWord('تقرير يومي - ' + esc(d.projectName), content);
+}
+
+function exportDailyReportExcel(id) {
+    var d = D.dailyLogs.find(function(x) { return x.id === id; });
+    if (!d) return;
+    exportExcel('تقرير_يومي_' + d.date, [{ name: 'تقرير', data: [
+            ['البيان', 'القيمة'],
+            ['التاريخ', d.date],
+            ['المشروع', d.projectName],
+            ['الموقع', d.location || ''],
+            ['العمل', d.workType || ''],
+            ['الكمية', d.qty || ''],
+            ['المعدات', d.equip || ''],
+            ['العمالة', d.workers || ''],
+            ['الإنجاز', d.progress || ''],
+            ['الطقس', d.weather || ''],
+            ['ملاحظات', d.notes || '']
+        ] }]);
+}
+
+/* ═══════════════ REMAINING FUNCTIONS ═══════════════ */
+function renderStaffPage(dataKey, title, staffType) {
+    var data = D[dataKey] || [];
+    var h = '<div class="toolbar"><span class="toolbar-title">' + title + ' (' + data.length + ')</span>' +
+        '<button class="btn btn-primary btn-sm" onclick="openStaffModal(\'' + dataKey + '\',\'' + staffType + '\')">+ إضافة</button>' +
+        '<button class="btn btn-print btn-sm" onclick="printElement(\'' + dataKey + 'Content\',\'' + title + '\')">🖨️ طباعة</button>' +
+        '<button class="btn btn-word btn-sm" onclick="exportStaffWord(\'' + dataKey + '\',\'' + title + '\')">📄 Word</button>' +
+        '<button class="btn btn-excel btn-sm" onclick="exportStaffExcel(\'' + dataKey + '\',\'' + title + '\')">📊 Excel</button></div>';
+    h += '<div id="' + dataKey + 'Content">';
+    if (!data.length) { h += '<div class="empty-message">لا يوجد كادر مسجل</div>'; } else {
+        h += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الاسم</th><th>المسمى</th><th>المشروع</th><th>الجهة</th><th>الجوال</th><th>الحضور اليوم</th><th>تسجيل</th></tr></thead><tbody>';
+        data.forEach(function(s, i) {
+            var proj = D.projects.find(function(p) { return p.id == s.projectId; });
+            var ta = D.attendanceRecords.filter(function(a) { return a.staffId == s.id && a.date == today(); });
+            var todayRec = ta.length > 0 ? ta[0] : null;
+            var ts = todayRec ? todayRec.status : '—';
+            var tsc = ts === 'حاضر' ? 'badge-green' : ts === 'متأخر' ? 'badge-yellow' : ts === 'غائب' ? 'badge-red' : '';
+            var attBtn = todayRec ? '<button class="btn btn-xs btn-warning" onclick="markAtt(' + s.id + ',' + todayRec.id + ')">✏️ تعديل</button>' : '<button class="btn btn-xs btn-success" onclick="markAtt(' + s.id + ')">✅ تسجيل</button>';
+            h += '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(s.name) + '</strong></td><td>' + esc(s.role || '') + '</td><td>' + esc(proj ? proj.name : '—') + '</td><td>' + esc(s.entity || '') + '</td><td>' + esc(s.phone || '') + '</td><td><span class="badge ' + tsc + '">' + ts + '</span></td><td>' + attBtn + '</td></tr>';
+        });
+        h += '</tbody></table></div>';
+        h += '<h4 style="color:#f0a500;margin:16px 0;">📋 بطاقات الكادر</h4>';
+        data.forEach(function(s) { h += buildStaffCard(s, dataKey); });
+    }
+    h += '</div>'; return h;
+}
+
+function buildStaffCard(s, dataKey) {
+    var proj = D.projects.find(function(p) { return p.id == s.projectId; });
+    var attLog = D.attendanceRecords.filter(function(a) { return a.staffId == s.id; }).sort(function(a, b) { return b.date.localeCompare(a.date); });
+    var present = attLog.filter(function(a) { return a.status === 'حاضر' || a.status === 'متأخر'; }).length;
+    var absent = attLog.filter(function(a) { return a.status === 'غائب'; }).length;
+    var rate = attLog.length > 0 ? Math.round((present / attLog.length) * 100) : 0;
+    var ini = String(s.name || '').split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2);
+    var avClass = dataKey === 'contractorStaff' ? 'contractor-avatar' : 'supervisor-avatar';
+    var todayRec = attLog.find(function(a) { return a.date === today(); });
+    var todayBadge = todayRec ? '<span class="badge ' + (todayRec.status === 'حاضر' ? 'badge-green' : todayRec.status === 'متأخر' ? 'badge-yellow' : 'badge-red') + '">' + todayRec.status + '</span>' : '<span class="badge badge-blue">لم يسجل</span>';
+    var h = '<div class="staff-profile-card">';
+    h += '<div class="staff-avatar-large ' + avClass + '">' + ini + '</div>';
+    h += '<div class="staff-info" style="flex:1;min-width:200px;">';
+    h += '<h3 style="font-size:15px;margin-bottom:2px;">' + esc(s.name) + '</h3>';
+    h += '<div class="staff-meta" style="display:flex;gap:10px;flex-wrap:wrap;font-size:9px;color:#7fa8c9;margin-bottom:4px;">';
+    h += '<span>💼 ' + esc(s.role || '') + '</span><span>🏗️ ' + esc(proj ? proj.name : '—') + '</span><span>🏢 ' + esc(s.entity || '') + '</span><span>📱 ' + esc(s.phone || '') + '</span>';
+    if (s.specialty) h += '<span>🎓 ' + esc(s.specialty) + '</span>';
+    h += '</div>';
+    h += '<div class="attendance-stats-row">';
+    h += '<div class="attendance-stat"><div class="stat-val">' + attLog.length + '</div><div class="stat-lbl">أيام</div></div>';
+    h += '<div class="attendance-stat"><div class="stat-val" style="color:#22c55e;">' + present + '</div><div class="stat-lbl">حضور</div></div>';
+    h += '<div class="attendance-stat"><div class="stat-val" style="color:#ef4444;">' + absent + '</div><div class="stat-lbl">غياب</div></div>';
+    h += '<div class="attendance-stat"><div class="stat-val" style="color:' + (rate >= 90 ? '#22c55e' : rate >= 70 ? '#f59e0b' : '#ef4444') + ';">' + rate + '%</div><div class="stat-lbl">نسبة</div></div>';
+    h += '</div>';
+    h += '<div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">';
+    h += '<span style="font-size:10px;">اليوم: </span>' + todayBadge;
+    h += todayRec ? '<button class="btn btn-xs btn-warning" onclick="markAtt(' + s.id + ',' + todayRec.id + ')">✏️ تعديل اليوم</button>' : '<button class="btn btn-xs btn-success" onclick="markAtt(' + s.id + ')">✅ تسجيل اليوم</button>';
+    h += '<button class="btn btn-xs btn-outline" onclick="openStaffModal(\'' + dataKey + '\',\'\',' + s.id + ')">✏️ تعديل البيانات</button>';
+    h += '</div></div></div>';
+    return h;
+}
+
+function openStaffModal(dataKey, staffType, editId) {
+    g('f_sf_data_key').value = dataKey; g('f_sf_type').value = staffType || 'مقاول';
+    if (editId) {
+        var data = D[dataKey] || []; var s = data.find(function(x) { return x.id === editId; });
+        if (!s) return;
+        g('f_sf_id').value = s.id; g('f_sf_name').value = s.name || ''; g('f_sf_role').value = s.role || '';
+        g('f_sf_proj').value = s.projectId || ''; g('f_sf_entity').value = s.entity || '';
+        g('f_sf_phone').value = s.phone || ''; g('f_sf_email').value = s.email || '';
+        g('f_sf_nationality').value = s.nationality || ''; g('f_sf_specialty').value = s.specialty || '';
+        g('f_sf_experience').value = s.experience || 0; g('f_sf_hire_date').value = s.hireDate || '';
+        g('f_sf_work_hours').value = s.workHours || 8;
+    } else {
+        ['f_sf_id', 'f_sf_name', 'f_sf_role', 'f_sf_phone', 'f_sf_email', 'f_sf_nationality', 'f_sf_specialty'].forEach(function(id) { g(id).value = ''; });
+        g('f_sf_experience').value = '0'; g('f_sf_work_hours').value = '8'; g('f_sf_hire_date').value = today();
+    }
+    updateSelects('f_sf_proj'); openModal('modal_staff');
+}
+
+function saveStaff() {
+    var dk = g('f_sf_data_key').value; var id = parseInt(g('f_sf_id').value); var n = g('f_sf_name').value.trim();
+    if (!n) { toast('⚠️ أدخل اسم الكادر'); return; }
+    var data = { name: n, role: g('f_sf_role').value, projectId: g('f_sf_proj').value, entity: g('f_sf_entity').value, phone: g('f_sf_phone').value.trim(), email: g('f_sf_email').value.trim(), nationality: g('f_sf_nationality').value.trim(), specialty: g('f_sf_specialty').value.trim(), experience: g('f_sf_experience').value, hireDate: g('f_sf_hire_date').value, workHours: g('f_sf_work_hours').value };
+    if (!D[dk]) D[dk] = [];
+    if (id) { var ex = D[dk].find(function(x) { return x.id === id; }); if (ex) Object.assign(ex, data); } else { data.id = Date.now();
+        D[dk].push(data); }
+    closeModal('modal_staff');
+    syncAllData();
+    saveData();
+    refreshPage();
+    updateDashboard();
+    toast('✅ تم حفظ بيانات الكادر');
+}
+
+function markAtt(staffId, editRecordId) {
+    var all = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+    var s = all.find(function(x) { return x.id === staffId; });
+    if (!s) return;
+    updateAttSelect();
+    g('f_att_staff').value = staffId;
+    if (editRecordId) {
+        var rec = D.attendanceRecords.find(function(r) { return r.id === editRecordId; });
+        if (!rec) return;
+        g('f_att_edit_id').value = rec.id;
+        g('f_att_date').value = rec.date;
+        g('f_att_in').value = rec.timeIn || '';
+        g('f_att_out').value = rec.timeOut || '';
+        g('f_att_hours').value = rec.workHours || '';
+        g('f_att_status').value = rec.status || 'حاضر';
+        g('f_att_notes').value = rec.notes || '';
+        g('modal_attendance').querySelector('.modal-title').textContent = '✏️ تعديل سجل الدوام';
+    } else {
+        var todayRec = D.attendanceRecords.find(function(r) { return r.staffId === staffId && r.date === today(); });
+        if (todayRec) {
+            g('f_att_edit_id').value = todayRec.id;
+            g('f_att_date').value = todayRec.date;
+            g('f_att_in').value = todayRec.timeIn || '';
+            g('f_att_out').value = todayRec.timeOut || '';
+            g('f_att_hours').value = todayRec.workHours || '';
+            g('f_att_status').value = todayRec.status || 'حاضر';
+            g('f_att_notes').value = todayRec.notes || '';
+            g('modal_attendance').querySelector('.modal-title').textContent = '✏️ تعديل دوام اليوم';
+        } else {
+            g('f_att_edit_id').value = '';
+            g('f_att_date').value = today();
+            var now = new Date();
+            g('f_att_in').value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            g('f_att_out').value = '';
+            g('f_att_hours').value = s.workHours || '8';
+            g('f_att_status').value = 'حاضر';
+            g('f_att_notes').value = '';
+            g('modal_attendance').querySelector('.modal-title').textContent = '✅ تسجيل دوام';
+        }
+    }
+    openModal('modal_attendance');
+}
+
+function saveAttendance() {
+    var sid = parseInt(g('f_att_staff').value);
+    if (!sid) { toast('⚠️ اختر الكادر'); return; }
+    var dateVal = g('f_att_date').value;
+    if (!dateVal) { toast('⚠️ اختر التاريخ'); return; }
+    var all = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+    var s = all.find(function(x) { return x.id === sid; });
+    var editId = parseInt(g('f_att_edit_id').value) || 0;
+    var recData = { staffId: sid, staffName: s ? s.name : '', date: dateVal, timeIn: g('f_att_in').value, timeOut: g('f_att_out').value, workHours: g('f_att_hours').value, status: g('f_att_status').value, notes: g('f_att_notes').value.trim() };
+    if (editId) { var ex = D.attendanceRecords.find(function(r) { return r.id === editId; }); if (ex) { Object.assign(ex, recData);
+            toast('✅ تم تحديث الدوام'); } else { recData.id = Date.now();
+            D.attendanceRecords.push(recData);
+            toast('✅ تم الحفظ'); } } else { var dup = D.attendanceRecords.find(function(r) { return r.staffId === sid && r.date === dateVal; }); if (dup) { Object.assign(dup, recData);
+            toast('✅ تم تحديث الدوام'); } else { recData.id = Date.now();
+            D.attendanceRecords.push(recData);
+            toast('✅ تم تسجيل الدوام'); } }
+    closeModal('modal_attendance');
+    syncAllData();
+    saveData();
+    refreshPage();
+}
+
+function renderAttendanceDash() {
+    var all = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+    var filterDate = g('attFilterDate') ? g('attFilterDate').value : today();
+    var tr = D.attendanceRecords.filter(function(a) { return a.date === filterDate; });
+    var present = tr.filter(function(a) { return a.status === 'حاضر' || a.status === 'متأخر'; }).length;
+    var absent = tr.filter(function(a) { return a.status === 'غائب'; }).length;
+    var h = '<div class="toolbar"><span class="toolbar-title">✅ داشبورد الدوام</span><label style="font-size:10px;margin:0 4px;">📅 التاريخ:</label><input type="date" id="attFilterDate" value="' + filterDate + '" onchange="refreshPage()" style="padding:6px 10px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;font-family:Cairo;font-size:10px;"><button class="btn btn-primary btn-sm" onclick="openModal(\'modal_attendance\')">+ تسجيل دوام</button><button class="btn btn-print btn-sm" onclick="printElement(\'attDash\',\'تقرير الدوام\')">🖨️ طباعة</button></div>';
+    h += '<div class="stats-row"><div class="stat-card"><div class="val" style="color:#22c55e;">' + present + '</div><div class="lbl">حضور</div></div><div class="stat-card"><div class="val" style="color:#ef4444;">' + absent + '</div><div class="lbl">غياب</div></div><div class="stat-card"><div class="val" style="color:#f59e0b;">' + (all.length - present - absent) + '</div><div class="lbl">لم يسجل</div></div><div class="stat-card"><div class="val">' + all.length + '</div><div class="lbl">الكادر الكلي</div></div></div>';
+    h += '<div id="attDash"><h4 style="color:#f0a500;margin:10px 0 8px;">👥 حالة الكادر - ' + filterDate + '</h4><div class="table-wrap"><table><thead><tr><th>#</th><th>الموظف</th><th>المسمى</th><th>الجهة</th><th>الحالة</th><th>الحضور</th><th>الانصراف</th><th>الساعات</th><th>تعديل</th></tr></thead><tbody>';
+    all.forEach(function(s, i) {
+        var rec = tr.find(function(r) { return r.staffId === s.id; });
+        var st = rec ? rec.status : 'لم يسجل';
+        var sc = st === 'حاضر' ? 'badge-green' : st === 'متأخر' ? 'badge-yellow' : st === 'غائب' ? 'badge-red' : 'badge-blue';
+        var editBtn = rec ? '<button class="btn btn-xs btn-warning" onclick="markAtt(' + s.id + ',' + rec.id + ')">✏️</button>' : '<button class="btn btn-xs btn-success" onclick="markAtt(' + s.id + ')">✅ تسجيل</button>';
+        h += '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(s.name) + '</strong></td><td>' + esc(s.role || '') + '</td><td>' + esc(s.entity || '') + '</td><td><span class="badge ' + sc + '">' + st + '</span></td><td>' + (rec && rec.timeIn ? rec.timeIn : '—') + '</td><td>' + (rec && rec.timeOut ? rec.timeOut : '—') + '</td><td>' + (rec && rec.workHours ? rec.workHours + ' س' : '—') + '</td><td>' + editBtn + '</td></tr>';
+    });
+    h += '</tbody></table></div></div>'; return h;
+}
+
+function exportStaffWord(dk, title) {
+    var d = D[dk] || [];
+    if (!d.length) return;
+    var h = '<table><thead><tr><th>الاسم</th><th>المسمى</th><th>المشروع</th><th>الجهة</th><th>الجوال</th></tr></thead><tbody>';
+    d.forEach(function(s) { var p = D.projects.find(function(x) { return x.id == s.projectId; });
+        h += '<tr><td>' + esc(s.name) + '</td><td>' + esc(s.role || '') + '</td><td>' + esc(p ? p.name : '') + '</td><td>' + esc(s.entity || '') + '</td><td>' + esc(s.phone || '') + '</td></tr>'; });
+    h += '</tbody></table>';
+    exportWord(title, h);
+}
+
+function exportStaffExcel(dk, title) {
+    var d = D[dk] || [];
+    if (!d.length) return;
+    var dd = [
+        ['الاسم', 'المسمى', 'المشروع', 'الجهة', 'الجوال']
+    ];
+    d.forEach(function(s) { var p = D.projects.find(function(x) { return x.id == s.projectId; });
+        dd.push([s.name || '', s.role || '', p ? p.name : '', s.entity || '', s.phone || '']); });
+    exportExcel(title, [{ name: title, data: dd }]);
+}
+
+/* ═══════════════ QUALITY ═══════════════ */
+function updateQualityItems() {
+    var pid = g('f_qproj').value;
+    var sel = g('f_qitem');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">اختر بنداً</option>';
+    D.boqItems.filter(function(b) { return b.projectId == pid; }).forEach(function(b) { sel.innerHTML += '<option value="' + b.id + '">' + esc(b.description || b.name || '') + '</option>'; });
+}
+
+function saveQuality() {
+    var pid = g('f_qproj').value;
+    if (!pid) { toast('⚠️ اختر مشروعاً'); return; }
+    D.qualityChecks.push({ id: Date.now(), projectId: pid, itemId: g('f_qitem').value, testType: g('f_qtype').value.trim(), date: g('f_qdate').value, result: g('f_qresult').value.trim(), status: g('f_qstatus').value, notes: g('f_qnotes').value.trim() });
+    closeModal('modal_quality');
+    ['f_qtype', 'f_qresult', 'f_qnotes'].forEach(function(id) { g(id).value = ''; });
+    syncAllData();
+    saveData();
+    refreshPage();
+    toast('✅ تم حفظ الفحص');
+}
+
+function editQualityCheck(id) {
+    var check = D.qualityChecks.find(function(c) { return c.id === id; });
+    if (!check) return;
+    g('f_qe_id').value = check.id;
+    g('f_qe_status').value = check.status;
+    g('f_qe_notes').value = '';
+    openModal('modal_quality_edit');
+}
+
+function saveQualityEdit() {
+    var id = parseInt(g('f_qe_id').value);
+    var check = D.qualityChecks.find(function(c) { return c.id === id; });
+    if (!check) return;
+    check.status = g('f_qe_status').value;
+    var editNotes = g('f_qe_notes').value.trim();
+    if (editNotes) {
+        check.notes = (check.notes ? check.notes + ' | ' : '') + 'تعديل: ' + editNotes;
+    }
+    closeModal('modal_quality_edit');
+    syncAllData();
+    saveData();
+    refreshPage();
+    toast('✅ تم تعديل حالة الفحص');
+}
+
+function renderQualityPage() {
+    var h = '<div class="toolbar"><span class="toolbar-title">🔬 الفحوصات</span><label style="font-size:10px;margin:0 8px;">المشروع:</label><select id="qFilterProj" onchange="refreshPage()" style="min-width:200px;padding:6px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;"><option value="">اختر مشروعاً</option>' + D.projects.map(function(p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('') + '</select><button class="btn btn-primary btn-sm" onclick="updateSelects(\'f_qproj\');openModal(\'modal_quality\')">+ إضافة فحص</button><button class="btn btn-print btn-sm" onclick="printElement(\'qualityContent\',\'الفحوصات\')">🖨️ طباعة</button><button class="btn btn-word btn-sm" onclick="exportQualityWord()">📄 Word</button></div>';
+    var pid = (g('qFilterProj') || {}).value;
+    var checks = pid ? D.qualityChecks.filter(function(c) { return c.projectId == pid; }) : D.qualityChecks;
+    var boqItems = pid ? D.boqItems.filter(function(b) { return b.projectId == pid; }) : D.boqItems;
+    h += '<div id="qualityContent">';
+    if (pid && boqItems.length) {
+        h += '<h4 style="color:#f0a500;margin:12px 0;">📋 البنود والفحوصات</h4>';
+        boqItems.forEach(function(b) {
+            var bChecks = checks.filter(function(c) { return c.itemId == b.id; });
+            var allMatch = bChecks.length > 0 && bChecks.every(function(c) { return c.status === 'مطابق'; });
+            var hasFailed = bChecks.some(function(c) { return c.status === 'غير مطابق'; });
+            var statusIcon = allMatch ? '✅' : hasFailed ? '❌' : '🔄';
+            var statusColor = allMatch ? '#22c55e' : hasFailed ? '#ef4444' : '#f59e0b';
+            h += '<div style="background:#162d45;border:1px solid #2a4a6a;border-radius:8px;padding:12px;margin-bottom:8px;"><strong style="color:' + statusColor + ';">' + statusIcon + ' ' + esc(b.description || b.name || 'بند ' + b.id) + '</strong><span style="font-size:10px;color:#7fa8c9;margin-right:8px;">(' + bChecks.length + ' فحوصات)</span>';
+            if (bChecks.length) {
+                h += '<div class="table-wrap" style="margin-top:6px;"><table><thead><tr><th>التاريخ</th><th>نوع الفحص</th><th>النتيجة</th><th>الحالة</th><th>تعديل</th></tr></thead><tbody>';
+                bChecks.forEach(function(c) {
+                    var sc = c.status === 'مطابق' ? 'badge-green' : c.status === 'غير مطابق' ? 'badge-red' : 'badge-yellow';
+                    h += '<tr><td>' + c.date + '</td><td>' + esc(c.testType) + '</td><td>' + esc(c.result || '') + '</td><td><span class="badge ' + sc + '" style="cursor:pointer;" onclick="editQualityCheck(' + c.id + ')" title="اضغط لتعديل الحالة">' + c.status + '</span></td><td><button class="btn btn-xs btn-warning" onclick="editQualityCheck(' + c.id + ')">✏️ تعديل</button></td></tr>';
+                });
+                h += '</tbody></table></div>';
+            } else { h += '<div style="font-size:10px;color:#7fa8c9;margin-top:4px;">لا توجد فحوصات لهذا البند</div>'; }
+            h += '</div>';
+        });
+    } else if (pid) { h += '<div class="empty-message">لا توجد بنود لهذا المشروع</div>'; } else { h += '<div class="empty-message">اختر مشروعاً لعرض البنود والفحوصات</div>'; }
+    h += '</div>'; return h;
+}
+
+function exportQualityWord() {
+    var pid = (g('qFilterProj') || {}).value;
+    var checks = pid ? D.qualityChecks.filter(function(c) { return c.projectId == pid; }) : D.qualityChecks;
+    if (!checks.length) return;
+    var h = '<table><thead><tr><th>التاريخ</th><th>نوع الفحص</th><th>النتيجة</th><th>الحالة</th></tr></thead><tbody>';
+    checks.forEach(function(c) { h += '<tr><td>' + c.date + '</td><td>' + esc(c.testType) + '</td><td>' + esc(c.result || '') + '</td><td>' + c.status + '</td></tr>'; });
+    h += '</tbody></table>';
+    exportWord('الفحوصات', h);
+}
+
+/* ═══════════════ KPI ═══════════════ */
+function renderKPIPage() {
+    var h = '<div class="toolbar"><span class="toolbar-title">📊 مؤشرات الأداء KPI</span><label style="font-size:10px;margin:0 8px;">المشروع:</label><select id="kpiFilterProj" onchange="refreshPage()" style="min-width:200px;padding:6px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;"><option value="">اختر مشروعاً</option>' + D.projects.map(function(p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('') + '</select><button class="btn btn-print btn-sm" onclick="printElement(\'kpiContent\',\'مؤشرات الأداء\')">🖨️ طباعة</button><button class="btn btn-word btn-sm" onclick="exportKPIWord()">📄 Word</button></div>';
+    var pid = (g('kpiFilterProj') || {}).value;
+    var p = pid ? D.projects.find(function(x) { return x.id == pid; }) : null;
+    h += '<div id="kpiContent">';
+    if (p) {
+        var allStaff = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+        var projStaff = allStaff.filter(function(s) { return s.projectId == pid; });
+        var attRecords = D.attendanceRecords.filter(function(a) { return projStaff.some(function(s) { return s.id === a.staffId; }); });
+        var presentDays = attRecords.filter(function(a) { return a.status === 'حاضر' || a.status === 'متأخر'; }).length;
+        var totalAttDays = attRecords.length;
+        var staffAttRate = totalAttDays > 0 ? Math.round((presentDays / totalAttDays) * 100) : 0;
+        var issues = D.issues.filter(function(i) { return i.projectId == pid && i.status === 'مفتوحة'; }).length;
+        var checks = D.qualityChecks.filter(function(c) { return c.projectId == pid; });
+        var matchChecks = checks.filter(function(c) { return c.status === 'مطابق'; }).length;
+        var qualityRate = checks.length > 0 ? Math.round((matchChecks / checks.length) * 100) : 0;
+        var planned = p.plannedProgress || 0,
+            diff = p.progress - planned;
+        var tc = diff >= 0 ? 'up' : diff > -5 ? 'stable' : 'down',
+            ta = diff >= 0 ? '🔼' : diff > -5 ? '▶️' : '🔽',
+            tt = diff >= 0 ? 'متقدم' : diff > -5 ? 'حسب المخطط' : 'متأخر';
+        h += '<div class="kpi-dashboard"><div class="kpi-card"><div class="kpi-title">🚗 عداد الإنجاز</div>' + buildSpeedometer(p.progress, 130) + '</div><div class="kpi-card"><div class="kpi-title">📈 الأداء مقابل المخطط</div><div style="font-size:10px;">مخطط: <b style="color:#f0a500;">' + planned + '%</b> | فعلي: <b>' + p.progress + '%</b></div><div class="trend-box ' + tc + '">' + ta + ' ' + tt + '</div></div><div class="kpi-card"><div class="kpi-title">👷 التزام الكادر</div><div style="font-size:22px;font-weight:900;color:' + (staffAttRate >= 90 ? '#22c55e' : staffAttRate >= 70 ? '#f59e0b' : '#ef4444') + ';">' + staffAttRate + '%</div></div><div class="kpi-card"><div class="kpi-title">🔬 جودة الفحوصات</div><div style="font-size:22px;font-weight:900;color:' + (qualityRate >= 90 ? '#22c55e' : qualityRate >= 70 ? '#f59e0b' : '#ef4444') + ';">' + qualityRate + '%</div><div style="font-size:9px;">' + matchChecks + '/' + checks.length + ' مطابقة</div></div><div class="kpi-card"><div class="kpi-title">⚠️ مشكلات مفتوحة</div>' + buildCounter(issues, 2) + '</div></div>';
+    } else { h += '<div class="empty-message">اختر مشروعاً لعرض مؤشرات الأداء</div>'; }
+    h += '</div>'; return h;
+}
+
+function exportKPIWord() {
+    var pid = (g('kpiFilterProj') || {}).value;
+    var p = pid ? D.projects.find(function(x) { return x.id == pid; }) : null;
+    if (!p) return;
+    var h = '<table><tr><td style="background:#f0f4f8;font-weight:700;">المشروع</td><td>' + esc(p.name) + '</td></tr><tr><td style="background:#f0f4f8;font-weight:700;">نسبة الإنجاز</td><td>' + p.progress + '%</td></tr><tr><td style="background:#f0f4f8;font-weight:700;">الحالة</td><td>' + p.status + '</td></tr></table>';
+    exportWord('مؤشرات الأداء - ' + esc(p.name), h);
+}
+
+/* ═══════════════ ISSUES ═══════════════ */
+function renderIssuesPage() {
+    var h = '<div class="toolbar"><span class="toolbar-title">⚠️ المشكلات</span><label style="font-size:10px;margin:0 8px;">المشروع:</label><select id="issueFilterProj" onchange="refreshPage()" style="min-width:200px;padding:6px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;"><option value="">جميع المشاريع</option>' + D.projects.map(function(p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('') + '</select><button class="btn btn-danger btn-sm" onclick="addIssue()">+ إضافة مشكلة</button><button class="btn btn-print btn-sm" onclick="printElement(\'issuesContent\',\'المشكلات\')">🖨️ طباعة</button><button class="btn btn-word btn-sm" onclick="exportIssuesWord()">📄 Word</button></div>';
+    var pid = (g('issueFilterProj') || {}).value;
+    var issues = pid ? D.issues.filter(function(i) { return i.projectId == pid; }) : D.issues;
+    h += '<div id="issuesContent">';
+    if (!issues.length) { h += '<div class="empty-message">لا توجد مشكلات مسجلة</div>'; } else {
+        h += '<div class="table-wrap"><table><thead><tr><th>#</th><th>التاريخ</th><th>المشروع</th><th>المشكلة</th><th>الأولوية</th><th>الجهة المسؤولة</th><th>الإجراء</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>';
+        issues.forEach(function(iss, i) {
+            var sc = iss.status === 'مفتوحة' ? 'badge-red' : 'badge-green';
+            var actionBtn = iss.status === 'مفتوحة' ?
+                '<button class="btn btn-xs btn-success" onclick="closeIssue(' + iss.id + ')">✅ إغلاق</button>' :
+                '<button class="btn btn-xs btn-warning" onclick="reopenIssue(' + iss.id + ')">🔓 إعادة فتح</button>';
+            h += '<tr><td>' + (i + 1) + '</td><td>' + iss.date + '</td><td>' + esc(iss.projectName) + '</td><td><strong>' + esc(iss.title) + '</strong></td><td>' + iss.priority + '</td><td>' + esc(iss.responsible || '') + '</td><td><span class="editable" contenteditable="true" onblur="updateIssueField(' + iss.id + ',\'action\',this.textContent)">' + esc(iss.action || '—') + '</span></td><td><span class="badge ' + sc + '" style="cursor:pointer;" onclick="toggleIssueStatus(' + iss.id + ')">' + iss.status + '</span></td><td>' + actionBtn + '</td></tr>';
+        });
+        h += '</tbody></table></div>';
+    }
+    h += '</div>'; return h;
+}
+
+function addIssue() {
+    var pid = D.projects.length > 0 ? D.projects[0].id : null;
+    var p = pid ? D.projects.find(function(x) { return x.id == pid; }) : null;
+    D.issues.push({ id: Date.now(), projectId: pid, projectName: p ? p.name : '', date: today(), title: 'مشكلة جديدة', priority: 'متوسطة', responsible: '', action: '', status: 'مفتوحة' });
+    syncAllData();
+    saveData();
+    refreshPage();
+    toast('⚠️ تم إضافة مشكلة جديدة - قم بتعديل التفاصيل');
+}
+
+function closeIssue(id) {
+    var iss = D.issues.find(function(x) { return x.id === id; });
+    if (iss) { iss.status = 'مغلقة';
+        syncAllData();
+        saveData();
+        refreshPage();
+        toast('✅ تم إغلاق المشكلة'); }
+}
+
+function reopenIssue(id) {
+    var iss = D.issues.find(function(x) { return x.id === id; });
+    if (iss) { iss.status = 'مفتوحة';
+        syncAllData();
+        saveData();
+        refreshPage();
+        toast('🔓 تم إعادة فتح المشكلة'); }
+}
+
+function toggleIssueStatus(id) {
+    var iss = D.issues.find(function(x) { return x.id === id; });
+    if (iss) { iss.status = iss.status === 'مفتوحة' ? 'مغلقة' : 'مفتوحة';
+        syncAllData();
+        saveData();
+        refreshPage();
+        toast(iss.status === 'مغلقة' ? '✅ تم إغلاق المشكلة' : '🔓 تم إعادة فتح المشكلة'); }
+}
+
+function updateIssueField(id, field, value) {
+    var iss = D.issues.find(function(x) { return x.id === id; });
+    if (iss) { iss[field] = value;
+        syncAllData();
+        silentSave(); }
+}
+
+function exportIssuesWord() {
+    if (!D.issues.length) return;
+    var h = '<table><thead><tr><th>التاريخ</th><th>المشروع</th><th>المشكلة</th><th>الحالة</th></tr></thead><tbody>';
+    D.issues.forEach(function(iss) { h += '<tr><td>' + iss.date + '</td><td>' + esc(iss.projectName) + '</td><td>' + esc(iss.title) + '</td><td>' + iss.status + '</td></tr>'; });
+    h += '</tbody></table>';
+    exportWord('المشكلات', h);
+}
+
+/* ═══════════════ VISITS WITH FULL INFO ═══════════════ */
+function saveVisit() {
+    var pid = g('f_vproj').value;
+    if (!pid) { toast('⚠️ اختر مشروعاً'); return; }
+    var p = D.projects.find(function(x) { return x.id == pid; });
+    D.visits.push({
+        id: Date.now(),
+        projectId: pid,
+        projectName: p ? p.name : '',
+        date: g('f_vdate').value,
+        time: g('f_vtime').value,
+        inspector: g('f_vinsp').value.trim(),
+        department: g('f_vdept').value.trim(),
+        visitType: g('f_vtype').value,
+        location: g('f_vloc').value.trim(),
+        observedProgress: g('f_vprog').value,
+        workers: g('f_vworkers').value,
+        equip: g('f_vequip').value.trim(),
+        weather: g('f_vweather').value,
+        currentWork: g('f_vcurrent').value.trim(),
+        notes: g('f_vnotes').value.trim(),
+        rating: g('f_vrating').value,
+        schedule: g('f_vschedule').value,
+        specs: g('f_vspecs').value,
+        safety: g('f_vsafety').value,
+        recommendations: g('f_vrec').value.trim(),
+        reporter: g('f_vreporter').value.trim()
+    });
+    closeModal('modal_visit');
+    ['f_vinsp', 'f_vdept', 'f_vloc', 'f_vprog', 'f_vworkers', 'f_vequip', 'f_vcurrent', 'f_vnotes', 'f_vrec', 'f_vreporter'].forEach(function(id) { g(id).value = ''; });
+    syncAllData();
+    saveData();
+    refreshPage();
+    toast('✅ تم حفظ تقرير الزيارة');
+}
+
+function renderVisitsPage() {
+    var h = '<div class="toolbar"><span class="toolbar-title">🔍 الزيارات الميدانية</span><label style="font-size:10px;margin:0 8px;">المشروع:</label><select id="visitFilterProj" onchange="refreshPage()" style="min-width:200px;padding:6px;background:#1e3a52;border:1px solid #2a4a6a;border-radius:6px;color:#fff;"><option value="">جميع المشاريع</option>' + D.projects.map(function(p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('') + '</select><button class="btn btn-primary btn-sm" onclick="updateSelects(\'f_vproj\');openModal(\'modal_visit\')">+ زيارة جديدة</button><button class="btn btn-print btn-sm" onclick="printElement(\'visitsContent\',\'الزيارات الميدانية\')">🖨️ طباعة</button><button class="btn btn-word btn-sm" onclick="exportVisitsWord()">📄 Word</button></div>';
+    var pid = (g('visitFilterProj') || {}).value;
+    var visits = pid ? D.visits.filter(function(v) { return v.projectId == pid; }) : D.visits;
+    h += '<div id="visitsContent">';
+    if (!visits.length) { h += '<div class="empty-message">لا توجد زيارات ميدانية مسجلة</div>'; } else {
+        visits.slice().reverse().forEach(function(v) {
+            h += '<div style="background:#162d45;border:1px solid #2a4a6a;border-radius:10px;padding:16px;margin-bottom:10px;">' +
+                '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;"><strong style="font-size:14px;">🔍 ' + esc(v.projectName) + '</strong><span class="badge badge-blue">' + v.rating + '</span></div>' +
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;">' +
+                '<div><label style="color:#7fa8c9;">📅 التاريخ:</label> ' + v.date + (v.time ? ' | ⏰ ' + v.time : '') + '</div>' +
+                '<div><label style="color:#7fa8c9;">👤 المفتش:</label> ' + esc(v.inspector || '') + '</div>' +
+                '<div><label style="color:#7fa8c9;">🏢 الجهة:</label> ' + esc(v.department || '') + '</div>' +
+                '<div><label style="color:#7fa8c9;">📍 الموقع:</label> ' + esc(v.location || '') + '</div>' +
+                '<div><label style="color:#7fa8c9;">📊 الإنجاز:</label> ' + (v.observedProgress ? v.observedProgress + '%' : '—') + '</div>' +
+                '<div><label style="color:#7fa8c9;">👷 العمالة:</label> ' + (v.workers || '—') + '</div>' +
+                '</div>' +
+                (v.currentWork ? '<div style="margin-top:6px;"><label style="color:#7fa8c9;">🔧 الأعمال الجارية:</label> ' + esc(v.currentWork) + '</div>' : '') +
+                (v.notes ? '<div style="margin-top:6px;"><label style="color:#7fa8c9;">📝 الملاحظات:</label> ' + esc(v.notes) + '</div>' : '') +
+                '<div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">' +
+                '<span class="badge badge-blue">📅 ' + esc(v.schedule || '') + '</span>' +
+                '<span class="badge badge-purple">📐 ' + esc(v.specs || '') + '</span>' +
+                '<span class="badge badge-orange">⛑️ ' + esc(v.safety || '') + '</span></div>' +
+                (v.recommendations ? '<div style="margin-top:8px;padding:8px;background:rgba(240,165,0,0.1);border-right:3px solid #f0a500;border-radius:4px;"><strong>💡 التوصيات:</strong> ' + esc(v.recommendations) + '</div>' : '') +
+                '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
+                '<button class="btn btn-xs btn-print" onclick="printVisitReport(' + v.id + ')">🖨️ طباعة التقرير</button>' +
+                ' <button class="btn btn-xs btn-word" onclick="exportVisitWord(' + v.id + ')">📄 Word</button>' +
+                ' <button class="btn btn-xs btn-danger" onclick="deleteVisit(' + v.id + ')">🗑️ حذف</button></div></div>';
+        });
+    }
+    h += '</div>'; return h;
+}
+
+function printVisitReport(id) {
+    var v = D.visits.find(function(x) { return x.id === id; });
+    if (!v) return;
+    var content = '<div style="background:#fff;padding:20px;border-radius:10px;border:1px solid #e5e7eb;">' +
+        '<h3 style="color:#1a3a5c;border-right:4px solid #f0a500;padding-right:10px;margin-bottom:15px;">🔍 تقرير زيارة ميدانية</h3>' +
+        '<table>' +
+        '<tr><td style="width:25%;background:#f0f4f8;font-weight:700;padding:10px;">🏗️ المشروع</td><td style="padding:10px;" colspan="3">' + esc(v.projectName) + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">📅 التاريخ</td><td style="padding:10px;">' + v.date + (v.time ? ' | ' + v.time : '') + '</td><td style="background:#f0f4f8;font-weight:700;padding:10px;">👤 المفتش</td><td style="padding:10px;">' + esc(v.inspector || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">🏢 الجهة</td><td style="padding:10px;">' + esc(v.department || '—') + '</td><td style="background:#f0f4f8;font-weight:700;padding:10px;">📍 الموقع</td><td style="padding:10px;">' + esc(v.location || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">⭐ التقييم</td><td style="padding:10px;">' + v.rating + '</td><td style="background:#f0f4f8;font-weight:700;padding:10px;">📊 الإنجاز</td><td style="padding:10px;">' + (v.observedProgress ? v.observedProgress + '%' : '—') + '</td></tr>' +
+        (v.currentWork ? '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">🔧 الأعمال الجارية</td><td style="padding:10px;" colspan="3">' + esc(v.currentWork) + '</td></tr>' : '') +
+        (v.notes ? '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">📝 الملاحظات</td><td style="padding:10px;" colspan="3">' + esc(v.notes) + '</td></tr>' : '') +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">📅 الالتزام بالبرنامج</td><td style="padding:10px;">' + esc(v.schedule || '—') + '</td><td style="background:#f0f4f8;font-weight:700;padding:10px;">📐 المواصفات</td><td style="padding:10px;">' + esc(v.specs || '—') + '</td></tr>' +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">⛑️ السلامة</td><td style="padding:10px;">' + esc(v.safety || '—') + '</td><td style="background:#f0f4f8;font-weight:700;padding:10px;">👷 العمالة</td><td style="padding:10px;">' + (v.workers || '—') + '</td></tr>' +
+        (v.recommendations ? '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">💡 التوصيات</td><td style="padding:10px;" colspan="3">' + esc(v.recommendations) + '</td></tr>' : '') +
+        '<tr><td style="background:#f0f4f8;font-weight:700;padding:10px;">✍️ معد التقرير</td><td style="padding:10px;" colspan="3">' + esc(v.reporter || '—') + '</td></tr>' +
+        '</table></div>';
+    
+    printContent('تقرير زيارة - ' + esc(v.projectName), content);
+}
+
+function deleteVisit(id) {
+    if (!confirm('هل أنت متأكد من حذف هذه الزيارة؟')) return;
+    D.visits = D.visits.filter(function(x) { return x.id !== id; });
+    syncAllData();
+    saveData();
+    refreshPage();
+    toast('🗑️ تم حذف الزيارة');
+}
+
+function exportVisitWord(id) {
+    var v = D.visits.find(function(x) { return x.id === id; });
+    if (!v) return;
+    var h = '<table><tr><td style="background:#f0f4f8;font-weight:700;">المشروع</td><td>' + esc(v.projectName) + '</td></tr><tr><td style="background:#f0f4f8;font-weight:700;">التاريخ</td><td>' + v.date + '</td></tr><tr><td style="background:#f0f4f8;font-weight:700;">المفتش</td><td>' + esc(v.inspector || '') + '</td></tr><tr><td style="background:#f0f4f8;font-weight:700;">التقييم</td><td>' + v.rating + '</td></tr>' + (v.notes ? '<tr><td style="background:#f0f4f8;font-weight:700;">ملاحظات</td><td>' + esc(v.notes) + '</td></tr>' : '') + (v.recommendations ? '<tr><td style="background:#f0f4f8;font-weight:700;">توصيات</td><td>' + esc(v.recommendations) + '</td></tr>' : '') + '</table>';
+    exportWord('تقرير زيارة - ' + esc(v.projectName), h);
+}
+
+function exportVisitsWord() {
+    if (!D.visits.length) return;
+    var h = '<table><thead><tr><th>التاريخ</th><th>المشروع</th><th>المفتش</th><th>التقييم</th></tr></thead><tbody>';
+    D.visits.forEach(function(v) { h += '<tr><td>' + v.date + '</td><td>' + esc(v.projectName) + '</td><td>' + esc(v.inspector || '') + '</td><td>' + v.rating + '</td></tr>'; });
+    h += '</tbody></table>';
+    exportWord('الزيارات الميدانية', h);
+}
+
+/* ═══════════════ EXPORT PAGE ═══════════════ */
+function renderExport() {
+    var h = '<h4 style="color:#f0a500;margin-bottom:16px;">📄 تصدير التقارير</h4><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px;">';
+    h += '<button class="btn btn-word" onclick="exportProjectsWord()">📄 تقرير المشاريع - Word</button>';
+    h += '<button class="btn btn-excel" onclick="exportProjectsExcel()">📊 تقرير المشاريع - Excel</button>';
+    h += '<button class="btn btn-word" onclick="exportStaffWord(\'contractorStaff\',\'كادر المقاول\')">📄 كادر المقاول - Word</button>';
+    h += '<button class="btn btn-word" onclick="exportStaffWord(\'supervisorStaff\',\'كادر الإشراف\')">📄 كادر الإشراف - Word</button>';
+    h += '<button class="btn btn-word" onclick="exportGanttWord()">📄 الجدول الزمني - Word</button>';
+    h += '<button class="btn btn-excel" onclick="exportGanttExcel()">📊 الجدول الزمني - Excel</button>';
+    h += '<button class="btn btn-project" onclick="exportToMSProject(' + (currentGanttPid || (D.projects.length > 0 ? D.projects[0].id : 0)) + ')">📅 تصدير MS Project</button>';
+    h += '<button class="btn btn-word" onclick="exportQualityWord()">📄 الفحوصات - Word</button>';
+    h += '<button class="btn btn-word" onclick="exportKPIWord()">📄 مؤشرات KPI - Word</button>';
+    h += '<button class="btn btn-word" onclick="exportIssuesWord()">📄 المشكلات - Word</button>';
+    h += '<button class="btn btn-word" onclick="exportVisitsWord()">📄 الزيارات - Word</button></div>';
+    h += '<div style="margin-top:20px;padding:16px;background:#162d45;border:1px solid #2a4a6a;border-radius:10px;"><h4 style="color:#f0a500;margin-bottom:8px;">💾 حفظ واستعادة البيانات</h4><p style="font-size:10px;color:#7fa8c9;margin-bottom:10px;">يتم حفظ جميع البيانات تلقائياً في المتصفح.</p><button class="btn btn-success btn-sm" onclick="saveData()">💾 حفظ البيانات الآن</button> <button class="btn btn-purple btn-sm" onclick="loadDemo()">📥 تحميل 10 مشاريع تجريبية</button></div>';
+    return h;
+}
+
+/* ═══════════════ DASHBOARD ═══════════════ */
+function updateDashboard() {
+    var all = [].concat(D.contractorStaff || []).concat(D.supervisorStaff || []);
+    var s = [
+        { v: D.projects.length, l: 'إجمالي المشاريع' },
+        { v: D.projects.filter(function(p) { return p.status === 'نشط'; }).length, l: 'مشاريع نشطة' },
+        { v: all.length, l: 'الكادر' },
+        { v: D.timelineTasks.length, l: 'مهام زمنية' },
+        { v: D.qualityChecks.length, l: 'فحوصات' },
+        { v: D.issues.filter(function(i) { return i.status === 'مفتوحة'; }).length, l: 'مشكلات مفتوحة' }
+    ];
+    g('statsRow').innerHTML = s.map(function(x) { return '<div class="stat-card"><div class="val">' + x.v + '</div><div class="lbl">' + x.l + '</div></div>'; }).join('');
+}
+
+function renderSummary() {
+    var tb = g('summaryTable');
+    if (!tb) return;
+    if (!D.projects.length) { tb.innerHTML = '<tr><td colspan="7"><div class="empty-message">لا توجد مشاريع</div></td></tr>'; return; }
+    tb.innerHTML = D.projects.map(function(p, i) {
+        var pc = p.progress >= 70 ? 'prog-green' : p.progress >= 40 ? 'prog-yellow' : 'prog-red';
+        var sc = { 'نشط': 'badge-green', 'منجز': 'badge-blue', 'متوقف': 'badge-red', 'مخطط': 'badge-yellow' } [p.status] || 'badge-yellow';
+        var li = D.issues.filter(function(x) { return x.projectId == p.id && x.status === 'مفتوحة'; }).length;
+        return '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(p.name) + '</strong></td><td>' + esc(p.province || '') + '</td><td>' + esc(p.contractor || '') + '</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="flex:1"><div class="progress-fill ' + pc + '" style="width:' + p.progress + '%"></div></div>' + p.progress + '%</div></td><td><span class="badge ' + sc + '">' + p.status + '</span></td><td>' + (li > 0 ? '<span class="badge badge-red">' + li + '</span>' : '✅') + '</td></tr>';
+    }).join('');
+}
+
+function refreshPage() { if (currentPage) g('contentBody').innerHTML = renderPage(currentPage); }
+
+/* ═══════════════ LOAD 10 FULL PROJECTS ═══════════════ */
+function loadDemo() {
+    D = { projects: [], dailyLogs: [], timelineTasks: [], visits: [], issues: [], boqItems: [], contractorStaff: [], supervisorStaff: [], attendanceRecords: [], qualityChecks: [] };
+    var t = today(), y = new Date(); y.setDate(y.getDate() - 1); var ys = y.toISOString().split('T')[0];
+    var d2 = new Date(); d2.setDate(d2.getDate() - 2); var d2s = d2.toISOString().split('T')[0];
+    
+    D.projects = [
+        { id: 1, name: 'تأهيل وتوسعة طريق المطار', contractNo: '2024/001', province: 'عمان', location: 'دوار المدينة الرياضية', contractor: 'شركة الحسن', consultant: 'دار الهندسة', supervisor: 'م. أحمد الخوالدة', length: '15.2', start: '2024-03-15', end: '2025-09-15', budget: '28000000', progress: 48, plannedProgress: 45, status: 'نشط', lastUpdate: t },
+        { id: 2, name: 'طريق إربد الدائري', contractNo: '2024/002', province: 'إربد', location: 'مثلث حوارة', contractor: 'الأردنية للطرق', consultant: 'مكتب القدس', supervisor: 'م. محمد الزعبي', length: '22.5', start: '2024-01-10', end: '2025-12-31', budget: '45000000', progress: 42, plannedProgress: 40, status: 'نشط', lastUpdate: t },
+        { id: 3, name: 'طريق البحر الميت - العدسية', contractNo: '2024/003', province: 'البلقاء', location: 'مثلث البحر الميت', contractor: 'إعمار الأردن', consultant: 'CDM Smith', supervisor: 'م. عمر العبادي', length: '35', start: '2024-06-01', end: '2026-06-01', budget: '65000000', progress: 22, plannedProgress: 25, status: 'نشط', lastUpdate: t },
+        { id: 4, name: 'ازدواج طريق الزرقاء - المفرق', contractNo: '2024/004', province: 'الزرقاء', location: 'جسر الحسين', contractor: 'المتكاملة', consultant: 'Arabtech', supervisor: 'م. خالد الشوابكة', length: '45', start: '2024-02-20', end: '2025-08-20', budget: '55000000', progress: 55, plannedProgress: 50, status: 'نشط', lastUpdate: t },
+        { id: 5, name: 'طريق وادي موسى - البتراء', contractNo: '2024/005', province: 'معان', location: 'مدخل وادي موسى', contractor: 'الجنوب', consultant: 'مكتب ناصر', supervisor: 'م. طارق النوافلة', length: '8.5', start: '2024-09-01', end: '2025-03-01', budget: '8500000', progress: 72, plannedProgress: 70, status: 'نشط', lastUpdate: t },
+        { id: 6, name: 'طريق عمان - جرش', contractNo: '2024/006', province: 'جرش', location: 'مثلث البقعة', contractor: 'الوسط', consultant: 'الرأي', supervisor: 'م. رامي العجارمة', length: '55', start: '2024-04-15', end: '2026-04-15', budget: '78000000', progress: 28, plannedProgress: 30, status: 'نشط', lastUpdate: t },
+        { id: 7, name: 'طريق الكرك - القطرانة', contractNo: '2024/007', province: 'الكرك', location: 'مدخل الكرك', contractor: 'الوطنية', consultant: 'Engicon', supervisor: 'م. سامي المجالي', length: '30', start: '2024-07-01', end: '2025-07-01', budget: '32000000', progress: 45, plannedProgress: 45, status: 'نشط', lastUpdate: t },
+        { id: 8, name: 'تطوير طريق العقبة', contractNo: '2024/008', province: 'العقبة', location: 'مدخل العقبة', contractor: 'العقبة للإنشاءات', consultant: 'أمانة عمان', supervisor: 'م. حسين الكساسبة', length: '42', start: '2024-05-01', end: '2025-11-01', budget: '42000000', progress: 40, plannedProgress: 40, status: 'نشط', lastUpdate: t },
+        { id: 9, name: 'طريق مادبا - أم العمد', contractNo: '2024/009', province: 'مادبا', location: 'دوار مادبا', contractor: 'البتراء للطرق', consultant: 'العمارنة', supervisor: 'م. نضال الحديدي', length: '18', start: '2024-08-15', end: '2025-08-15', budget: '22000000', progress: 33, plannedProgress: 35, status: 'نشط', lastUpdate: t },
+        { id: 10, name: 'طريق الطفيلة - الحسا', contractNo: '2024/010', province: 'الطفيلة', location: 'مدخل الطفيلة', contractor: 'الجنوب الهندسية', consultant: 'SAJDI', supervisor: 'م. عاصم القطاطشة', length: '25', start: '2024-10-01', end: '2025-10-01', budget: '28000000', progress: 18, plannedProgress: 20, status: 'نشط', lastUpdate: t }
+    ];
+    
+    D.boqItems = [
+        { id: 1, projectId: 1, code: '1.1', description: 'أعمال الحفر والردم', unit: 'م³', plannedQty: 45000, executedQty: 38000, status: 'مكتمل' },
+        { id: 2, projectId: 1, code: '1.2', description: 'طبقة الأساس الحصوي', unit: 'م³', plannedQty: 12000, executedQty: 8500, status: 'قيد التنفيذ' },
+        { id: 3, projectId: 1, code: '2.1', description: 'الأسفلت - الطبقة الرابطة', unit: 'طن', plannedQty: 8500, executedQty: 3200, status: 'متأخر' },
+        { id: 4, projectId: 1, code: '2.2', description: 'الأسفلت - الطبقة السطحية', unit: 'طن', plannedQty: 5500, executedQty: 0, status: 'لم يبدأ' }
+    ];
+    
+    D.qualityChecks = [
+        { id: 1, projectId: 1, itemId: 1, testType: 'فحص الدمك', date: t, result: 'نسبة الدمك 98%', status: 'مطابق', notes: '' },
+        { id: 2, projectId: 1, itemId: 1, testType: 'فحص بروكتور', date: ys, result: 'الكثافة الجافة 2.1', status: 'مطابق', notes: '' },
+        { id: 3, projectId: 1, itemId: 2, testType: 'CBR', date: ys, result: 'CBR=22', status: 'مطابق', notes: '' },
+        { id: 4, projectId: 1, itemId: 2, testType: 'بروكتور', date: d2s, result: 'الكثافة 95%', status: 'غير مطابق', notes: 'يحتاج إعادة' },
+        { id: 5, projectId: 1, itemId: 3, testType: 'فحص حرارة الأسفلت', date: t, result: '155°C', status: 'مطابق', notes: '' },
+        { id: 6, projectId: 1, itemId: 3, testType: 'فحص مارشال', date: d2s, result: 'ثبات 12kN', status: 'مطابق', notes: '' }
+    ];
+    
+    var tasks = [
+        { name: 'التحضيرات', dur: 7, start: '2024-03-15', type: 'ترابية', st: 'مكتملة', prog: 100, c: '#22c55e' },
+        { name: 'حرث ورش ودحل', dur: 12, start: '2024-03-22', type: 'ترابية', st: 'مكتملة', prog: 100, c: '#3b82f6' },
+        { name: 'اعمال SUB BASE', dur: 18, start: '2024-04-03', type: 'أساس', st: 'قيد التنفيذ', prog: 65, c: '#f97316' },
+        { name: 'اعمال BASE', dur: 21, start: '2024-04-21', type: 'أساس', st: 'لم تبدأ', prog: 0, c: '#f97316' }
+    ];
+    tasks.forEach(function(tsk, i) {
+        var sd = parseDate(tsk.start), ed = new Date(sd); ed.setDate(ed.getDate() + tsk.dur - 1);
+        D.timelineTasks.push({ id: i + 1, projectId: 1, projectName: 'تأهيل وتوسعة طريق المطار', order: i + 1, name: tsk.name, duration: tsk.dur, startDate: tsk.start, endDate: formatDate(ed), type: tsk.type, status: tsk.st, progress: tsk.prog, color: tsk.c });
+    });
+    
+    D.contractorStaff = [
+        { id: 1, name: 'محمد العتيبي', role: 'مدير مشروع', projectId: 1, entity: 'المقاول', phone: '0795123456', nationality: 'أردني', specialty: 'هندسة', experience: '15', workHours: '10', hireDate: '2024-02-01' },
+        { id: 2, name: 'علي الأحمد', role: 'مهندس مدني', projectId: 1, entity: 'المقاول', phone: '0795234567', nationality: 'أردني', specialty: 'مدني', experience: '8', workHours: '10', hireDate: '2024-03-01' },
+        { id: 3, name: 'حسن محمد', role: 'مساح', projectId: 1, entity: 'المقاول', phone: '0795345678', nationality: 'مصري', specialty: 'مساحة', experience: '10', workHours: '10', hireDate: '2024-02-15' }
+    ];
+    D.supervisorStaff = [
+        { id: 101, name: 'م. أحمد الخوالدة', role: 'مهندس مشرف', projectId: 1, entity: 'الوزارة', phone: '0796123456', email: 'ahmad@mpwh.gov.jo', nationality: 'أردني', specialty: 'طرق', experience: '18', workHours: '8', hireDate: '2023-06-01' },
+        { id: 102, name: 'م. فادي حداد', role: 'مهندس مقيم', projectId: 1, entity: 'الاستشاري', phone: '0796234567', email: 'fadi@dar.com', nationality: 'أردني', specialty: 'إشراف', experience: '12', workHours: '8', hireDate: '2024-01-15' }
+    ];
+    
+    [t, ys].forEach(function(date) {
+        [].concat(D.contractorStaff).concat(D.supervisorStaff).forEach(function(s) {
+            var r = Math.random(), st = r > 0.85 ? 'غائب' : r > 0.75 ? 'متأخر' : 'حاضر';
+            D.attendanceRecords.push({ id: Date.now() + Math.random(), staffId: s.id, staffName: s.name, date: date, timeIn: st === 'غائب' ? '' : '07:00', timeOut: st === 'غائب' ? '' : '15:00', workHours: st === 'غائب' ? '0' : s.workHours, status: st, notes: '' });
+        });
+    });
+    
+    D.dailyLogs = [
+        { id: 1, projectId: 1, projectName: 'تأهيل وتوسعة طريق المطار', date: t, location: 'الكم 3+200', workType: 'فرش طبقة أساس حصوي', qty: '450 م³', equip: 'جريدر، رصاصة', workers: '12', weather: 'صحو', progress: '48', notes: 'العمل يسير حسب الخطة' },
+        { id: 2, projectId: 1, projectName: 'تأهيل وتوسعة طريق المطار', date: ys, location: 'الكم 2+800', workType: 'أعمال حفر', qty: '320 م³', equip: 'حفار، قلاب', workers: '8', weather: 'غائم', progress: '45', notes: 'تأخير بسيط بسبب الطقس' }
+    ];
+    
+    D.visits = [
+        { id: 1, projectId: 1, projectName: 'تأهيل وتوسعة طريق المطار', date: t, time: '09:30', inspector: 'م. ناصر القحطاني', department: 'مديرية الإشراف', visitType: 'دورية', location: 'الكم 5+000', observedProgress: '48', workers: '15', equip: 'جريدر، رصاصة', weather: 'صحو', currentWork: 'فرش طبقة أساس حصوي', notes: 'سير العمل ممتاز', rating: 'ممتاز', schedule: 'حسب البرنامج', specs: 'ممتاز', safety: 'جيد', recommendations: 'زيادة عدد العمالة', reporter: 'م. ناصر القحطاني' }
+    ];
+    
+    D.issues = [
+        { id: 1, projectId: 1, projectName: 'تأهيل وتوسعة طريق المطار', date: ys, title: 'تأخر تحويلات المرور', priority: 'عالية', responsible: 'إدارة السير', action: 'مخاطبة رسمية', status: 'مفتوحة' },
+        { id: 2, projectId: 4, projectName: 'ازدواج طريق الزرقاء - المفرق', date: d2s, title: 'تأخر توريد حديد التسليح', priority: 'متوسطة', responsible: 'المقاول', action: 'متابعة المورد', status: 'مفتوحة' }
+    ];
+    
+    syncAllData();
+    saveData();
+    updateDashboard();
+    renderSummary();
+    if (currentPage) refreshPage();
+    toast('✅ تم تحميل 10 مشاريع أردنية مع جميع البيانات التجريبية');
+}
+
+/* ═══════════════ INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+    var ts = today();
+    document.querySelectorAll('input[type=date]').forEach(function(el) { if (!el.value) el.value = ts; });
+    loadData();
+    syncAllData();
+    updateDashboard();
+    renderSummary();
+    g('loginPass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+});
+</script>
+</body>
+</html>
