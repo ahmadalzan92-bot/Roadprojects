@@ -80,11 +80,16 @@ body {
 
 /* ═══════════════ LOGIN SCREEN ═══════════════ */
 .login-screen {
+     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     background: linear-gradient(135deg, #0a1628 0%, #0d2137 40%, #162d45 100%);
-    flex-direction: column;
+    flex-direction: row;
+        /* 👈 غير column إلى row */
+    gap: 30px;                 /* 👈 أضف هذا السطر */
+    flex-wrap: wrap;           /* 👈 أضف هذا السطر */
+    padding: 20px;
     position: relative;
     overflow: hidden;
 }
@@ -1082,6 +1087,199 @@ tr:hover td {
     height: 100%;
     object-fit: contain;
 }
+
+/* الحاوية الرئيسية لفريق العمل */
+.team-panel {
+    background: #162d45;
+    border: 1px solid #2a4a6a;
+    border-right: 4px solid #f0a500;
+    border-radius: 15px;
+    padding: 25px 20px;
+    width: 320px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+}
+
+/* رأس البانر */
+.team-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(240, 165, 0, 0.2);
+}
+
+.team-header .team-icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.team-header h3 {
+    font-size: 18px;
+    font-weight: 900;
+    color: #f0a500;
+    margin-bottom: 3px;
+}
+
+.team-header p {
+    font-size: 11px;
+    color: #7fa8c9;
+    margin: 0;
+}
+
+/* قائمة الأعضاء */
+.team-members {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+/* بطاقة العضو */
+.member-card {
+    background: rgba(26, 51, 80, 0.8);
+    border: 1px solid #2a4a6a;
+    border-radius: 10px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.member-card:hover {
+    transform: translateX(-5px);
+    border-color: #f0a500;
+    box-shadow: 0 5px 15px rgba(240, 165, 0, 0.2);
+}
+
+/* بطاقة المشرف */
+.member-card.supervisor-card {
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.member-card.supervisor-card:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2);
+}
+
+/* الصورة الرمزية */
+.member-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.dev-avatar {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: 3px solid #60a5fa;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+.supervisor-avatar {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    border: 3px solid #a78bfa;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+}
+
+.member-avatar .star {
+    position: absolute;
+    top: -8px;
+    right: -5px;
+    font-size: 16px;
+}
+
+/* معلومات العضو */
+.member-info {
+    margin-bottom: 8px;
+}
+
+.member-info h4 {
+    font-size: 14px;
+    font-weight: 900;
+    color: #f0a500;
+    margin-bottom: 3px;
+}
+
+.member-info .role {
+    display: block;
+    font-size: 11px;
+    color: #e8f0f8;
+    font-weight: 600;
+}
+
+.member-info .specialty {
+    display: block;
+    font-size: 9px;
+    color: #7fa8c9;
+}
+
+/* مهارات العضو */
+.member-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.skill {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 8px;
+    font-weight: 700;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.skill-super {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 8px;
+    font-weight: 700;
+    background: rgba(139, 92, 246, 0.2);
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* تذييل الفريق */
+.team-footer {
+    text-align: center;
+    padding-top: 12px;
+    border-top: 2px solid rgba(240, 165, 0, 0.2);
+    font-size: 10px;
+    color: #7fa8c9;
+    line-height: 1.5;
+}
+
+.team-footer span {
+    display: block;
+    font-size: 8px;
+}
+
+.team-footer .version {
+    color: #f0a500;
+    font-weight: 700;
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+/* للتكيف مع الشاشات الصغيرة */
+@media (max-width: 800px) {
+    .login-screen {
+        flex-direction: column !important;
+    }
+    .team-panel {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+
+
 </style>
 </head>
 <body>
@@ -1120,7 +1318,81 @@ tr:hover td {
         </button>
         <div class="login-error" id="loginError" style="display:none;color:#ef4444;text-align:center;margin-top:10px;padding:8px;background:rgba(239,68,68,0.1);border-radius:6px;font-size:11px;"></div>
     </div>
+
+<div class="team-panel">
+    
+    <!-- رأس البانر -->
+    <div class="team-header">
+        <span class="team-icon">👨‍💻</span>
+        <h3>فريق العمل والتطوير</h3>
+        <p>نظام متابعة مشاريع الطرق</p>
+    </div>
+    
+    <!-- قائمة الأعضاء -->
+    <div class="team-members">
+        
+        <!-- 👤 العضو الأول: م. أحمد الزن -->
+        <div class="member-card">
+            <div class="member-avatar dev-avatar">أ.ز</div>
+            <div class="member-info">
+                <h4>م. أحمد الزن</h4>
+                <span class="role">💻 مطور رئيسي</span>
+                <span class="specialty">Full Stack Developer</span>
+            </div>
+            <div class="member-skills">
+                <span class="skill">HTML5</span>
+                <span class="skill">CSS3</span>
+                <span class="skill">JavaScript</span>
+            </div>
+        </div>
+        
+        <!-- 👤 العضو الثاني: م. رحاب السعدوني -->
+        <div class="member-card">
+            <div class="member-avatar dev-avatar">ر.س</div>
+            <div class="member-info">
+                <h4>م. رحاب السعدوني</h4>
+                <span class="role">🎨 مطور تصميم</span>
+                <span class="specialty">UI/UX Designer</span>
+            </div>
+            <div class="member-skills">
+                <span class="skill">UI Design</span>
+                <span class="skill">UX Research</span>
+                <span class="skill">Frontend</span>
+            </div>
+        </div>
+        
+        <!-- 👤 العضو الثالث: م. عبدالناصر الكلباني -->
+        <div class="member-card supervisor-card">
+            <div class="member-avatar supervisor-avatar">
+                <span class="star">⭐</span>
+                ع.ك
+            </div>
+            <div class="member-info">
+                <h4>م. عبدالناصر الكلباني</h4>
+                <span class="role">👨‍🏫 المشرف العام</span>
+                <span class="specialty">Project Supervisor</span>
+            </div>
+            <div class="member-skills">
+                <span class="skill-super">إدارة المشاريع</span>
+                <span class="skill-super">ضمان الجودة</span>
+                <span class="skill-super">إشراف عام</span>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- تذييل البانر -->
+    <div class="team-footer">
+        🛣️ وزارة الأشغال العامة والإسكان<br>
+        <span>المملكة الأردنية الهاشمية</span>
+        <span class="version">الإصدار 1.0</span>
+    </div>
+    
 </div>
+
+</div>
+
+
 
 <!-- ═══════════════ DASHBOARD SCREEN ═══════════════ -->
 <div class="screen dashboard-screen" id="screen-dashboard">
@@ -1372,7 +1644,7 @@ tr:hover td {
 </div>
 
 <div class="toast" id="toast"></div>
-
+</div>
 <script>
 /* ═══════════════ GLOBAL STATE ═══════════════ */
 var currentUser = null;
